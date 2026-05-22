@@ -1,0 +1,55 @@
+<resources>
+    <string name="app_name">BookStore</string>
+
+    <!-- Auth -->
+    <string name="login">Đăng nhập</string>
+    <string name="register">Đăng ký</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Mật khẩu</string>
+    <string name="confirm_password_hint">Xác nhận mật khẩu</string>
+    <string name="full_name_hint">Họ và tên</string>
+    <string name="phone_hint">Số điện thoại</string>
+    <string name="address_hint">Địa chỉ</string>
+
+    <!-- Bottom Nav -->
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_search">Tìm kiếm</string>
+    <string name="nav_cart">Giỏ hàng</string>
+    <string name="nav_profile">Cá nhân</string>
+
+    <!-- Home -->
+    <string name="categories_label">Danh mục</string>
+    <string name="featured_books_label">Sách nổi bật</string>
+    <string name="newest_books_label">Sách mới nhất</string>
+
+    <!-- Cart & Checkout -->
+    <string name="cart_empty">Giỏ hàng của bạn đang trống</string>
+    <string name="total_amount">Tổng cộng:</string>
+    <string name="proceed_to_checkout">Tiến hành thanh toán</string>
+    <string name="shipping_info">Thông tin giao hàng</string>
+    <string name="payment_method">Phương thức thanh toán</string>
+    <string name="cod_payment">Thanh toán khi nhận hàng (COD)</string>
+    <string name="momo_payment">Ví MoMo (Mô phỏng)</string>
+    <string name="order_summary">Tóm tắt đơn hàng</string>
+    <string name="shipping_fee">Phí vận chuyển:</string>
+    <string name="place_order">Đặt hàng</string>
+
+    <!-- Profile -->
+    <string name="order_history">Lịch sử đơn hàng</string>
+    <string name="edit_profile">Chỉnh sửa thông tin</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="admin_panel">Quản trị hệ thống</string>
+
+    <!-- Admin -->
+    <string name="admin_dashboard">Bảng điều khiển Admin</string>
+    <string name="manage_books">Quản lý Sách</string>
+    <string name="manage_orders">Quản lý Đơn hàng</string>
+    <string name="statistics">Thống kê doanh thu</string>
+    <string name="add_book">Thêm sách mới</string>
+    <string name="edit_book">Sửa sách</string>
+    <string name="book_title_hint">Tên sách</string>
+    <string name="author_hint">Tác giả</string>
+    <string name="price_hint">Giá bán</string>
+    <string name="stock_hint">Số lượng trong kho</string>
+</resources>

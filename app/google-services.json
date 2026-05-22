@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "47035653482",
+    "project_id": "appbansach-7f07e",
+    "storage_bucket": "appbansach-7f07e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:47035653482:android:50da6346d7316da5179913",
+        "android_client_info": {
+          "package_name": "com.example.bookstore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "47035653482-305nrdim250k90ep4t8m1b3ce5tp3fmt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBroims8c2WPQFMuhodd4HmacvAQ5W_7wU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "47035653482-305nrdim250k90ep4t8m1b3ce5tp3fmt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
