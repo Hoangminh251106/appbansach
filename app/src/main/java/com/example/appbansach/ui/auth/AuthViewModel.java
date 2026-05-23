@@ -10,21 +10,32 @@ import com.example.appbansach.utils.Resource;
 
 public class AuthViewModel extends ViewModel {
     private final UserRepository userRepository;
+    
     private final MutableLiveData<Resource<User>> _loginStatus = new MutableLiveData<>();
-    public LiveData<Resource<User>> loginStatus = _loginStatus;
+    public LiveData<Resource<User>> getLoginStatus() { return _loginStatus; }
 
     private final MutableLiveData<Resource<Boolean>> _registerStatus = new MutableLiveData<>();
-    public LiveData<Resource<Boolean>> registerStatus = _registerStatus;
+    public LiveData<Resource<Boolean>> getRegisterStatus() { return _registerStatus; }
 
     public AuthViewModel() {
         this.userRepository = new UserRepository();
     }
 
     public void login(String email, String password) {
-        userRepository.login(email, password).observeForever(_loginStatus::setValue);
+        _loginStatus.setValue(Resource.loading(null));
+        userRepository.login(email, password).observeForever(resource -> {
+            _loginStatus.postValue(resource);
+        });
     }
 
     public void register(String email, String password, String fullName) {
-        userRepository.register(email, password, fullName).observeForever(_registerStatus::setValue);
+        _registerStatus.setValue(Resource.loading(null));
+        userRepository.register(email, password, fullName).observeForever(resource -> {
+            _registerStatus.postValue(resource);
+        });
+    }
+
+    public void logout() {
+        userRepository.logout();
     }
 }

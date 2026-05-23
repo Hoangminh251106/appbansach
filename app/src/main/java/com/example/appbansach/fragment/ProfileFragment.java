@@ -5,12 +5,13 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
+import com.example.appbansach.R;
 import com.example.appbansach.activity.LoginActivity;
 import com.example.appbansach.databinding.FragmentProfileBinding;
 import com.example.appbansach.model.User;
@@ -38,16 +39,23 @@ public class ProfileFragment extends Fragment {
         });
 
         binding.btnEditProfile.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Chức năng đang cập nhật", Toast.LENGTH_SHORT).show();
+            Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_editProfileFragment);
+        });
+
+        binding.btnOrderHistory.setOnClickListener(v -> {
+            Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_ordersFragment);
         });
 
         return binding.getRoot();
     }
 
     private void loadUserProfile() {
+        if (mAuth.getCurrentUser() == null) return;
+        
         String userId = mAuth.getCurrentUser().getUid();
-        db.collection("Users").document(userId).get().addOnSuccessListener(documentSnapshot -> {
-            if (documentSnapshot.exists()) {
+        // Sửa từ "Users" thành "users" để đồng bộ
+        db.collection("users").document(userId).get().addOnSuccessListener(documentSnapshot -> {
+            if (isAdded() && documentSnapshot.exists()) {
                 User user = documentSnapshot.toObject(User.class);
                 if (user != null) {
                     binding.tvProfileName.setText(user.getFullName());

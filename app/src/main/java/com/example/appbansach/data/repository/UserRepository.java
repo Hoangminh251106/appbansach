@@ -1,5 +1,6 @@
 package com.example.appbansach.data.repository;
 
+import android.util.Log;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -10,12 +11,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class UserRepository {
+    private static final String TAG = "UserRepository";
     private final FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public LiveData<Resource<Boolean>> register(String email, String password, String fullName) {
         MutableLiveData<Resource<Boolean>> result = new MutableLiveData<>();
         result.setValue(Resource.loading(null));
+        Log.d(TAG, "Bắt đầu đăng ký Firebase cho: " + email);
 
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
@@ -24,7 +27,9 @@ public class UserRepository {
                         User user = new User(uid, fullName, email, "", "", "customer", Timestamp.now());
                         saveUserToFirestore(user, result);
                     } else {
-                        result.setValue(Resource.error(task.getException().getMessage(), null));
+                        String error = task.getException() != null ? task.getException().getMessage() : "Lỗi Auth";
+                        Log.e(TAG, "Lỗi Firebase Auth: " + error);
+                        result.setValue(Resource.error(error, null));
                     }
                 });
         return result;
@@ -34,9 +39,12 @@ public class UserRepository {
         db.collection("users").document(user.getUid()).set(user)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
+                        Log.d(TAG, "Lưu Firestore thành công");
                         result.setValue(Resource.success(true));
                     } else {
-                        result.setValue(Resource.error(task.getException().getMessage(), null));
+                        String error = task.getException() != null ? task.getException().getMessage() : "Lỗi Firestore";
+                        Log.e(TAG, "Lỗi Firestore: " + error);
+                        result.setValue(Resource.error(error, null));
                     }
                 });
     }
@@ -44,13 +52,12 @@ public class UserRepository {
     public LiveData<Resource<User>> login(String email, String password) {
         MutableLiveData<Resource<User>> result = new MutableLiveData<>();
         result.setValue(Resource.loading(null));
-
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         getUserDetails(task.getResult().getUser().getUid(), result);
                     } else {
-                        result.setValue(Resource.error(task.getException().getMessage(), null));
+                        result.setValue(Resource.error("Sai tài khoản hoặc mật khẩu", null));
                     }
                 });
         return result;
@@ -63,17 +70,12 @@ public class UserRepository {
                     if (user != null) {
                         result.setValue(Resource.success(user));
                     } else {
-                        result.setValue(Resource.error("User not found", null));
+                        result.setValue(Resource.error("Không tìm thấy user", null));
                     }
                 })
                 .addOnFailureListener(e -> result.setValue(Resource.error(e.getMessage(), null)));
     }
 
-    public void logout() {
-        mAuth.signOut();
-    }
-
-    public String getCurrentUid() {
-        return mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getUid() : null;
-    }
+    public void logout() { mAuth.signOut(); }
+    public String getCurrentUid() { return mAuth.getCurrentUser() != null ? mAuth.getCurrentUser().getUid() : null; }
 }

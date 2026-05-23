@@ -7,7 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.bookstore.databinding.ItemCartBinding;
+import com.example.appbansach.databinding.ItemCartBinding;
 import com.example.appbansach.model.CartItem;
 
 import java.text.DecimalFormat;

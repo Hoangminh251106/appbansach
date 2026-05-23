@@ -1,36 +1,26 @@
 {
   "project_info": {
-    "project_number": "47035653482",
-    "project_id": "appbansach-7f07e",
-    "storage_bucket": "appbansach-7f07e.firebasestorage.app"
+    "project_number": "9546725148",
+    "project_id": "appbansach-85287",
+    "storage_bucket": "appbansach-85287.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:47035653482:android:50da6346d7316da5179913",
+        "mobilesdk_app_id": "1:9546725148:android:776de4f7939f52ec302cd9",
         "android_client_info": {
-          "package_name": "com.example.bookstore"
+          "package_name": "com.example.appbansach"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "47035653482-305nrdim250k90ep4t8m1b3ce5tp3fmt.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBroims8c2WPQFMuhodd4HmacvAQ5W_7wU"
+          "current_key": "AIzaSyCFaQyaHAn-95mXvT_2tFNqC2ugEGhquv8"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "47035653482-305nrdim250k90ep4t8m1b3ce5tp3fmt.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

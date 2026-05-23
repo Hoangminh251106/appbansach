@@ -1,4 +1,4 @@
-package com.example.bookstore.ui.auth;
+package com.example.appbansach.ui.auth;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,9 +12,9 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
-import com.example.bookstore.R;
-import com.example.bookstore.databinding.FragmentLoginBinding;
-import com.example.bookstore.utils.Resource;
+import com.example.appbansach.R;
+import com.example.appbansach.databinding.FragmentLoginBinding;
+import com.example.appbansach.utils.Resource;
 
 public class LoginFragment extends Fragment {
     private FragmentLoginBinding binding;
@@ -30,6 +30,7 @@ public class LoginFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // Đảm bảo sử dụng AuthViewModel của gói appbansach
         viewModel = new ViewModelProvider(requireActivity()).get(AuthViewModel.class);
 
         binding.btnLogin.setOnClickListener(v -> {
@@ -50,7 +51,7 @@ public class LoginFragment extends Fragment {
     }
 
     private void observeViewModel() {
-        viewModel.getAuthStatus().observe(getViewLifecycleOwner(), resource -> {
+        viewModel.getLoginStatus().observe(getViewLifecycleOwner(), resource -> {
             if (resource != null) {
                 switch (resource.status) {
                     case LOADING:
@@ -61,6 +62,7 @@ public class LoginFragment extends Fragment {
                         binding.progressBar.setVisibility(View.GONE);
                         binding.btnLogin.setEnabled(true);
                         Toast.makeText(getContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+                        // Chuyển sang Home
                         Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_homeFragment);
                         break;
                     case ERROR:

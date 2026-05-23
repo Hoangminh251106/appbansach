@@ -1,4 +1,4 @@
-package com.example.bookstore.ui.home;
+package com.example.appbansach.adapter;
 
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -7,16 +7,22 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.example.bookstore.data.model.Banner;
 import com.example.appbansach.databinding.ItemBannerBinding;
+import com.example.appbansach.model.Banner;
 
 import java.util.List;
 
 public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerViewHolder> {
-    private final List<Banner> banners;
+    private List<Banner> bannerList;
+    private OnBannerClickListener listener;
 
-    public BannerAdapter(List<Banner> banners) {
-        this.banners = banners;
+    public interface OnBannerClickListener {
+        void onBannerClick(Banner banner);
+    }
+
+    public BannerAdapter(List<Banner> bannerList, OnBannerClickListener listener) {
+        this.bannerList = bannerList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -28,15 +34,17 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
 
     @Override
     public void onBindViewHolder(@NonNull BannerViewHolder holder, int position) {
-        Banner banner = banners.get(position);
+        Banner banner = bannerList.get(position);
         Glide.with(holder.itemView.getContext())
                 .load(banner.getImageUrl())
                 .into(holder.binding.ivBanner);
+        
+        holder.itemView.setOnClickListener(v -> listener.onBannerClick(banner));
     }
 
     @Override
     public int getItemCount() {
-        return banners.size();
+        return bannerList.size();
     }
 
     public static class BannerViewHolder extends RecyclerView.ViewHolder {

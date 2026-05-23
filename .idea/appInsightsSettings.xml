@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="com.example.bookstore" />
-                  <option name="mobileSdkAppId" value="1:47035653482:android:50da6346d7316da5179913" />
-                  <option name="projectId" value="appbansach-7f07e" />
-                  <option name="projectNumber" value="47035653482" />
+                  <option name="appId" value="com.example.appbansach" />
+                  <option name="mobileSdkAppId" value="1:9546725148:android:776de4f7939f52ec302cd9" />
+                  <option name="projectId" value="appbansach-85287" />
+                  <option name="projectNumber" value="9546725148" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

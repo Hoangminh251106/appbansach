@@ -1,4 +1,4 @@
-package com.example.bookstore.ui.auth;
+package com.example.appbansach.ui.auth;
 
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -13,9 +13,9 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
-import com.example.bookstore.R;
-import com.example.bookstore.databinding.FragmentRegisterBinding;
-import com.example.bookstore.utils.Resource;
+import com.example.appbansach.R;
+import com.example.appbansach.databinding.FragmentRegisterBinding;
+import com.example.appbansach.utils.Resource;
 
 public class RegisterFragment extends Fragment {
     private FragmentRegisterBinding binding;
@@ -31,6 +31,7 @@ public class RegisterFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // Sử dụng chung ViewModel của gói appbansach gắn với Activity
         viewModel = new ViewModelProvider(requireActivity()).get(AuthViewModel.class);
 
         binding.btnRegister.setOnClickListener(v -> {
@@ -46,7 +47,7 @@ public class RegisterFragment extends Fragment {
             }
 
             if (password.length() < 6) {
-                Toast.makeText(getContext(), "Mật khẩu phải ít nhất 6 ký tự", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Mật khẩu phải từ 6 ký tự", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -64,6 +65,7 @@ public class RegisterFragment extends Fragment {
     }
 
     private void observeViewModel() {
+        // Quan sát registerStatus từ AuthViewModel của appbansach
         viewModel.getRegisterStatus().observe(getViewLifecycleOwner(), resource -> {
             if (resource == null) return;
             switch (resource.status) {
@@ -73,13 +75,14 @@ public class RegisterFragment extends Fragment {
                     break;
                 case SUCCESS:
                     binding.progressBar.setVisibility(View.GONE);
-                    Toast.makeText(getContext(), "Đăng ký thành công", Toast.LENGTH_SHORT).show();
+                    binding.btnRegister.setEnabled(true);
+                    Toast.makeText(getContext(), "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
                     Navigation.findNavController(requireView()).navigateUp();
                     break;
                 case ERROR:
                     binding.progressBar.setVisibility(View.GONE);
                     binding.btnRegister.setEnabled(true);
-                    Toast.makeText(getContext(), "Lỗi: " + resource.message, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Lỗi: " + resource.message, Toast.LENGTH_LONG).show();
                     break;
             }
         });

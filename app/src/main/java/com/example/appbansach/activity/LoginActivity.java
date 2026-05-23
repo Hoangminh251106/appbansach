@@ -7,9 +7,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-// Sửa import sang bookstore để khớp với namespace
-import com.example.bookstore.databinding.ActivityLoginBinding;
-import com.example.bookstore.MainActivity; 
+import com.example.appbansach.databinding.ActivityLoginBinding;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActivity extends AppCompatActivity {

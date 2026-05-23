@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    // Namespace phải là com.example.appbansach để khớp với code Java hiện tại
+    // Namespace đồng nhất với package Java
     namespace = "com.example.appbansach"
     compileSdk = 35
 
     defaultConfig {
-        // applicationId phải là com.example.bookstore để khớp với file google-services.json
-        applicationId = "com.example.bookstore"
+        // Sửa lại applicationId cho khớp với google-services.json và package chính
+        applicationId = "com.example.appbansach"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

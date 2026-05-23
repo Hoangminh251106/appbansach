@@ -51,24 +51,31 @@ public class OrdersFragment extends Fragment {
     private void loadOrders() {
         if (mAuth.getCurrentUser() == null) return;
         String userId = mAuth.getCurrentUser().getUid();
-        db.collection("Orders")
+        
+        // Sửa từ "Orders" thành "orders" và "timestamp" thành "createdAt" để đồng bộ với OrderRepository
+        db.collection("orders")
                 .whereEqualTo("userId", userId)
-                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .orderBy("createdAt", Query.Direction.DESCENDING)
                 .get()
                 .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        orderList.clear();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Order order = document.toObject(Order.class);
-                            order.setOrderId(document.getId());
-                            orderList.add(order);
-                        }
-                        if (orderList.isEmpty()) {
-                            binding.tvNoOrders.setVisibility(View.VISIBLE);
+                    if (isAdded()) {
+                        if (task.isSuccessful() && task.getResult() != null) {
+                            orderList.clear();
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Order order = document.toObject(Order.class);
+                                order.setOrderId(document.getId());
+                                orderList.add(order);
+                            }
+                            if (orderList.isEmpty()) {
+                                binding.tvNoOrders.setVisibility(View.VISIBLE);
+                            } else {
+                                binding.tvNoOrders.setVisibility(View.GONE);
+                            }
+                            adapter.notifyDataSetChanged();
                         } else {
-                            binding.tvNoOrders.setVisibility(View.GONE);
+                            binding.tvNoOrders.setVisibility(View.VISIBLE);
+                            binding.tvNoOrders.setText("Lỗi khi tải đơn hàng");
                         }
-                        adapter.notifyDataSetChanged();
                     }
                 });
     }
