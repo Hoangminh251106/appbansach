@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:gravity="center_horizontal">
+    android:gravity="center_horizontal"
+    android:background="#F8F9FA">
 
     <TextView
         android:layout_width="wrap_content"
@@ -13,38 +14,153 @@
         android:text="Bảng điều khiển Admin"
         android:textSize="24sp"
         android:textStyle="bold"
+        android:textColor="@color/black"
         android:layout_marginTop="32dp"
-        android:layout_marginBottom="48dp" />
+        android:layout_marginBottom="32dp" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnManageBooks"
-        style="@style/Widget.Material3.Button.TonalButton"
+    <GridLayout
         android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:text="Quản lý Sách"
-        android:layout_marginBottom="16dp"
-        app:icon="@android:drawable/ic_menu_agenda"
-        app:iconSize="32dp" />
+        android:layout_height="wrap_content"
+        android:columnCount="2"
+        android:alignmentMode="alignMargins"
+        android:columnOrderPreserved="false">
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnManageOrders"
-        style="@style/Widget.Material3.Button.TonalButton"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:text="Quản lý Đơn hàng"
-        android:layout_marginBottom="16dp"
-        app:icon="@android:drawable/ic_menu_edit"
-        app:iconSize="32dp" />
+        <!-- Quản lý Sách -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnManageBooks"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="16dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@android:drawable/ic_menu_agenda"
+                    app:tint="?attr/colorPrimary" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sách"
+                    android:layout_marginTop="8dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnStatistics"
-        style="@style/Widget.Material3.Button.TonalButton"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:text="Thống kê doanh thu"
-        android:layout_marginBottom="16dp"
-        app:icon="@android:drawable/ic_menu_compass"
-        app:iconSize="32dp" />
+        <!-- Quản lý Danh mục -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnManageCategories"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="16dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@android:drawable/ic_menu_sort_by_size"
+                    app:tint="?attr/colorPrimary" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Danh mục"
+                    android:layout_marginTop="8dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Quản lý Đơn hàng -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnManageOrders"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="16dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@android:drawable/ic_menu_edit"
+                    app:tint="?attr/colorPrimary" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Đơn hàng"
+                    android:layout_marginTop="8dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Quản lý Voucher -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnManageVouchers"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="16dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@android:drawable/ic_menu_save"
+                    app:tint="?attr/colorPrimary" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Vouchers"
+                    android:layout_marginTop="8dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Thống kê -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnStatistics"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="16dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@android:drawable/ic_menu_compass"
+                    app:tint="?attr/colorPrimary" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Thống kê"
+                    android:layout_marginTop="8dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </GridLayout>
 
     <View
         android:layout_width="match_parent"

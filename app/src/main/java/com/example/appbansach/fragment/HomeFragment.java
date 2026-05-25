@@ -57,7 +57,6 @@ public class HomeFragment extends Fragment {
     }
 
     private void setupRecyclerViews() {
-        // Banners
         bannerList = new ArrayList<>();
         bannerAdapter = new BannerAdapter(bannerList, banner -> {
             if (banner.getTargetBookId() != null && !banner.getTargetBookId().isEmpty()) {
@@ -68,7 +67,6 @@ public class HomeFragment extends Fragment {
         });
         binding.viewPagerBanners.setAdapter(bannerAdapter);
 
-        // Categories
         categoryList = new ArrayList<>();
         categoryAdapter = new CategoryAdapter(categoryList, category -> {
             Bundle bundle = new Bundle();
@@ -80,13 +78,11 @@ public class HomeFragment extends Fragment {
         binding.rvCategories.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.rvCategories.setAdapter(categoryAdapter);
 
-        // Featured Books
         featuredBooks = new ArrayList<>();
         featuredAdapter = new BookAdapter(featuredBooks, this::navigateToDetail);
         binding.rvFeaturedBooks.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.rvFeaturedBooks.setAdapter(featuredAdapter);
 
-        // Newest Books
         newestBooks = new ArrayList<>();
         newestAdapter = new BookAdapter(newestBooks, this::navigateToDetail);
         binding.rvNewestBooks.setLayoutManager(new GridLayoutManager(getContext(), 2));
@@ -95,21 +91,18 @@ public class HomeFragment extends Fragment {
     }
 
     private void setupClickListeners() {
-        // Tìm kiếm
-        binding.ivSearch.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigate(R.id.action_homeFragment_to_searchFragment);
-        });
-
-        // "Xem tất cả" cho sách nổi bật
+        binding.ivSearch.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.action_homeFragment_to_searchFragment));
         binding.tvSeeAllFeatured.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
             bundle.putString("type", "featured");
             Navigation.findNavController(v).navigate(R.id.action_homeFragment_to_bookListFragment, bundle);
         });
-
-        // Nút giỏ hàng
-        binding.btnCart.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigate(R.id.cartFragment);
+        binding.btnCart.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.cartFragment));
+        
+        // Nhấn Banner để nạp dữ liệu thật nếu cần
+        binding.viewPagerBanners.setOnClickListener(v -> {
+            seedDataOnce();
+            Toast.makeText(getContext(), "Đang nạp dữ liệu sách thật...", Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -120,69 +113,74 @@ public class HomeFragment extends Fragment {
     }
 
     private void loadBanners() {
-        db.collection("banners").orderBy("order").get().addOnSuccessListener(queryDocumentSnapshots -> {
-            bannerList.clear();
-            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                Banner banner = doc.toObject(Banner.class);
-                banner.setId(doc.getId());
-                bannerList.add(banner);
-            }
-            bannerAdapter.notifyDataSetChanged();
-            if (bannerList.isEmpty()) {
-                seedDataOnce();
+        db.collection("banners").orderBy("order").addSnapshotListener((value, error) -> {
+            if (value != null) {
+                bannerList.clear();
+                for (QueryDocumentSnapshot doc : value) {
+                    Banner b = doc.toObject(Banner.class);
+                    b.setId(doc.getId());
+                    bannerList.add(b);
+                }
+                bannerAdapter.notifyDataSetChanged();
+                if (bannerList.isEmpty()) seedDataOnce();
             }
         });
     }
 
     private void loadCategories() {
-        db.collection("categories").get().addOnCompleteListener(task -> {
-            if (task.isSuccessful() && task.getResult() != null) {
+        db.collection("categories").addSnapshotListener((value, error) -> {
+            if (value != null) {
                 categoryList.clear();
-                for (QueryDocumentSnapshot document : task.getResult()) {
-                    Category category = document.toObject(Category.class);
-                    category.setId(document.getId());
-                    categoryList.add(category);
+                for (QueryDocumentSnapshot doc : value) {
+                    Category cat = doc.toObject(Category.class);
+                    cat.setId(doc.getId());
+                    categoryList.add(cat);
                 }
                 categoryAdapter.notifyDataSetChanged();
-                if (categoryList.isEmpty()) {
-                    seedDataOnce();
-                }
             }
         });
     }
 
     private void loadBooks() {
-        db.collection("books").whereEqualTo("featured", true).limit(5).get().addOnSuccessListener(queryDocumentSnapshots -> {
-            featuredBooks.clear();
-            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                Book book = doc.toObject(Book.class);
-                book.setId(doc.getId());
-                featuredBooks.add(book);
+        db.collection("books").whereEqualTo("featured", true).limit(10).addSnapshotListener((value, error) -> {
+            if (value != null) {
+                featuredBooks.clear();
+                for (QueryDocumentSnapshot doc : value) {
+                    Book b = doc.toObject(Book.class);
+                    b.setId(doc.getId());
+                    featuredBooks.add(b);
+                }
+                featuredAdapter.notifyDataSetChanged();
             }
-            featuredAdapter.notifyDataSetChanged();
         });
 
-        db.collection("books").orderBy("createdAt", Query.Direction.DESCENDING).limit(10).get().addOnSuccessListener(queryDocumentSnapshots -> {
-            newestBooks.clear();
-            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                Book book = doc.toObject(Book.class);
-                book.setId(doc.getId());
-                newestBooks.add(book);
+        db.collection("books").orderBy("createdAt", Query.Direction.DESCENDING).limit(20).addSnapshotListener((value, error) -> {
+            if (value != null) {
+                newestBooks.clear();
+                for (QueryDocumentSnapshot doc : value) {
+                    Book b = doc.toObject(Book.class);
+                    b.setId(doc.getId());
+                    newestBooks.add(b);
+                }
+                newestAdapter.notifyDataSetChanged();
             }
-            newestAdapter.notifyDataSetChanged();
         });
     }
 
     private void seedDataOnce() {
-        Log.d(TAG, "Đang tạo dữ liệu mẫu...");
-        
-        // Seed Banners
-        db.collection("banners").limit(1).get().addOnSuccessListener(queryDocumentSnapshots -> {
+        db.collection("categories").limit(1).get().addOnSuccessListener(queryDocumentSnapshots -> {
             if (queryDocumentSnapshots.isEmpty()) {
+                // Tạo danh mục
+                String[] cats = {"Kinh điển", "Kinh tế", "Kỹ năng sống", "Văn học"};
+                for (String name : cats) {
+                    Category c = new Category("", name, "https://cdn-icons-png.flaticon.com/512/3389/3389081.png");
+                    db.collection("categories").add(c).addOnSuccessListener(doc -> addProBooks(doc.getId(), name));
+                }
+                
+                // Tạo banner
                 String[] bannerUrls = {
                     "https://img.freepik.com/free-vector/hand-drawn-bookstore-sale-banner_23-2149724103.jpg",
-                    "https://img.freepik.com/free-vector/flat-world-book-day-background_23-2149312154.jpg",
-                    "https://img.freepik.com/free-vector/flat-world-book-day-vertical-poster-template_23-2149323719.jpg"
+                    "https://img.freepik.com/free-vector/flat-world-book-day-background_23-2149312154.jpg"
                 };
                 for (int i = 0; i < bannerUrls.length; i++) {
                     Banner b = new Banner();
@@ -190,53 +188,42 @@ public class HomeFragment extends Fragment {
                     b.setOrder(i);
                     db.collection("banners").add(b);
                 }
-                loadBanners();
-            }
-        });
-
-        // Seed Categories & Books
-        db.collection("categories").limit(1).get().addOnSuccessListener(queryDocumentSnapshots -> {
-            if (queryDocumentSnapshots.isEmpty()) {
-                String[] catNames = {"Văn học", "Kinh tế", "Kỹ năng", "Thiếu nhi"};
-                for (String name : catNames) {
-                    Category c = new Category("", name, "https://cdn-icons-png.flaticon.com/512/3389/3389081.png");
-                    db.collection("categories").add(c).addOnSuccessListener(doc -> {
-                        addSampleBooks(doc.getId(), name);
-                    });
-                }
-                Toast.makeText(getContext(), "Đã tạo dữ liệu mẫu!", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void addSampleBooks(String catId, String catName) {
-        for (int i = 1; i <= 3; i++) {
-            Book b = new Book();
-            b.setCategoryId(catId);
-            b.setPrice(120000 + (i * 10000));
-            b.setOriginalPrice(150000 + (i * 10000));
-            b.setFeatured(i == 1);
-            b.setStock(50);
-            b.setRating(4.0 + (i * 0.2));
-            b.setReviewCount(10 * i);
-            b.setCreatedAt(Timestamp.now());
-            b.setDescription("Đây là mô tả chi tiết cho cuốn sách thuộc thể loại " + catName + ". Cuốn sách mang lại nhiều giá trị kiến thức và cảm hứng cho người đọc trong cuộc sống hiện đại.");
-            
-            if (catName.equals("Văn học")) {
-                b.setTitle("Số Đỏ - Tập " + i);
-                b.setAuthor("Vũ Trọng Phụng");
-                b.setImageUrl("https://salt.tikicdn.com/cache/w1200/ts/product/d1/7b/72/7b0f69d2d0b4d45d62544259b3f9464e.jpg");
-            } else if (catName.equals("Kinh tế")) {
-                b.setTitle("Nhà Giả Kim - Phiên bản " + i);
-                b.setAuthor("Paulo Coelho");
-                b.setImageUrl("https://salt.tikicdn.com/cache/w1200/ts/product/45/3d/81/8f8b248ad0d1300966f368132049d5a7.jpg");
-            } else {
-                b.setTitle("Sách " + catName + " " + i);
-                b.setAuthor("Tác giả " + i);
-                b.setImageUrl("https://via.placeholder.com/300x400.png?text=Book+" + i);
-            }
-            db.collection("books").add(b).addOnSuccessListener(v -> loadBooks());
+    private void addProBooks(String catId, String catName) {
+        if (catName.equals("Kinh điển")) {
+            createBook(catId, "Nhà Giả Kim", "Paulo Coelho", 79000, 99000, 
+                "https://salt.tikicdn.com/cache/w1200/ts/product/45/3d/81/8f8b248ad0d1300966f368132049d5a7.jpg",
+                "Tất cả những trải nghiệm trong chuyến phiêu lưu theo đuổi định mệnh của Santiago đã giúp anh thấu hiểu được ý nghĩa sâu xa nhất của hạnh phúc, hòa hợp với vũ trụ và con người. Cuốn sách là một trong những tác phẩm bán chạy nhất mọi thời đại.", true);
+        } else if (catName.equals("Kỹ năng sống")) {
+            createBook(catId, "Đắc Nhân Tâm", "Dale Carnegie", 85000, 110000,
+                "https://salt.tikicdn.com/cache/w1200/ts/product/7e/1d/94/f9f1092a7f0e34c9c1b9708709f19616.jpg",
+                "Đắc Nhân Tâm là cuốn sách nổi tiếng nhất, có tầm ảnh hưởng nhất mọi thời đại. Cuốn sách đã được chuyển ngữ sang hầu hết các thứ tiếng trên thế giới và có mặt ở hàng trăm quốc gia.", true);
+        } else {
+            createBook(catId, "Sách hay: " + catName, "Tác giả uy tín", 120000, 150000, 
+                "https://via.placeholder.com/300x400.png?text=Book",
+                "Đây là cuốn sách tuyệt vời giúp bạn mở mang kiến thức về " + catName + ". Sách trình bày chi tiết và có nhiều ví dụ thực tiễn.", false);
         }
+    }
+
+    private void createBook(String catId, String title, String author, long price, long oldPrice, String url, String desc, boolean featured) {
+        Book b = new Book();
+        b.setCategoryId(catId);
+        b.setTitle(title);
+        b.setAuthor(author);
+        b.setPrice(price);
+        b.setOriginalPrice(oldPrice);
+        b.setImageUrl(url);
+        b.setDescription(desc);
+        b.setFeatured(featured);
+        b.setStock(100);
+        b.setRating(4.8);
+        b.setReviewCount(152);
+        b.setCreatedAt(Timestamp.now());
+        b.setNew(true);
+        db.collection("books").add(b);
     }
 
     @Override

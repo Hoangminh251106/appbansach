@@ -1,6 +1,8 @@
 package com.example.appbansach.model;
 
 import com.google.firebase.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 public class User {
     private String uid;
@@ -8,7 +10,9 @@ public class User {
     private String email;
     private String phone;
     private String address;
+    private String avatarUrl; // Thêm trường này
     private String role; // "customer" or "admin"
+    private List<String> wishlist = new ArrayList<>();
     private Timestamp createdAt;
 
     public User() {}
@@ -21,6 +25,7 @@ public class User {
         this.address = address;
         this.role = role;
         this.createdAt = createdAt;
+        this.wishlist = new ArrayList<>();
     }
 
     // Getters and Setters
@@ -34,8 +39,12 @@ public class User {
     public void setPhone(String phone) { this.phone = phone; }
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
+    public String getAvatarUrl() { return avatarUrl; }
+    public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+    public List<String> getWishlist() { return wishlist; }
+    public void setWishlist(List<String> wishlist) { this.wishlist = wishlist; }
     public Timestamp getCreatedAt() { return createdAt; }
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
 }

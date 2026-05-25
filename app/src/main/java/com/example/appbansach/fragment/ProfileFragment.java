@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import com.bumptech.glide.Glide;
 import com.example.appbansach.R;
 import com.example.appbansach.activity.LoginActivity;
 import com.example.appbansach.databinding.FragmentProfileBinding;
@@ -46,6 +47,18 @@ public class ProfileFragment extends Fragment {
             Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_ordersFragment);
         });
 
+        binding.btnWishlist.setOnClickListener(v -> {
+            Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_wishlistFragment);
+        });
+
+        binding.btnChatSupport.setOnClickListener(v -> {
+            Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_chatFragment);
+        });
+
+        binding.btnAdminPanel.setOnClickListener(v -> {
+            Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_adminDashboardFragment);
+        });
+
         return binding.getRoot();
     }
 
@@ -53,16 +66,24 @@ public class ProfileFragment extends Fragment {
         if (mAuth.getCurrentUser() == null) return;
         
         String userId = mAuth.getCurrentUser().getUid();
-        // Sửa từ "Users" thành "users" để đồng bộ
-        db.collection("users").document(userId).get().addOnSuccessListener(documentSnapshot -> {
-            if (isAdded() && documentSnapshot.exists()) {
+        db.collection("users").document(userId).addSnapshotListener((documentSnapshot, error) -> {
+            if (isAdded() && documentSnapshot != null && documentSnapshot.exists()) {
                 User user = documentSnapshot.toObject(User.class);
                 if (user != null) {
                     binding.tvProfileName.setText(user.getFullName());
                     binding.tvProfileEmail.setText(user.getEmail());
                     
+                    if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
+                        Glide.with(this)
+                                .load(user.getAvatarUrl())
+                                .placeholder(android.R.drawable.ic_menu_myplaces)
+                                .into(binding.ivAvatar);
+                    }
+
                     if ("admin".equals(user.getRole())) {
                         binding.btnAdminPanel.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.btnAdminPanel.setVisibility(View.GONE);
                     }
                 }
             }

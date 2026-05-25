@@ -5,7 +5,6 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
-import androidx.room.Update;
 
 import java.util.List;
 
@@ -13,6 +12,9 @@ import java.util.List;
 public interface CartDao {
     @Query("SELECT * FROM cart_items")
     LiveData<List<CartItemEntity>> getAllCartItems();
+
+    @Query("SELECT * FROM cart_items")
+    List<CartItemEntity> getAllCartItemsList();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertOrUpdate(CartItemEntity item);

@@ -14,17 +14,18 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.appbansach.activity.CheckoutActivity;
 import com.example.appbansach.adapter.CartAdapter;
+import com.example.appbansach.data.local.CartItemEntity;
 import com.example.appbansach.databinding.FragmentCartBinding;
 import com.example.appbansach.helper.CartManager;
-import com.example.appbansach.model.CartItem;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CartFragment extends Fragment {
     private FragmentCartBinding binding;
     private CartAdapter adapter;
-    private List<CartItem> cartItems;
+    private List<CartItemEntity> currentItems = new ArrayList<>();
 
     @Nullable
     @Override
@@ -32,10 +33,10 @@ public class CartFragment extends Fragment {
         binding = FragmentCartBinding.inflate(inflater, container, false);
         
         setupCartList();
-        updateUI();
+        observeCart();
 
         binding.btnProceedCheckout.setOnClickListener(v -> {
-            if (cartItems.isEmpty()) {
+            if (currentItems == null || currentItems.isEmpty()) {
                 Toast.makeText(getContext(), "Giỏ hàng trống", Toast.LENGTH_SHORT).show();
             } else {
                 startActivity(new Intent(getActivity(), CheckoutActivity.class));
@@ -46,46 +47,45 @@ public class CartFragment extends Fragment {
     }
 
     private void setupCartList() {
-        cartItems = CartManager.getInstance().getCartItems();
-        adapter = new CartAdapter(cartItems, new CartAdapter.OnCartItemChangeListener() {
+        adapter = new CartAdapter(new ArrayList<>(), new CartAdapter.OnCartItemChangeListener() {
             @Override
-            public void onQuantityChange(int position, int newQuantity) {
-                cartItems.get(position).setQuantity(newQuantity);
-                adapter.notifyItemChanged(position);
-                updateUI();
+            public void onQuantityChange(CartItemEntity item, int newQuantity) {
+                CartManager.getInstance(requireContext()).updateQuantity(item.getBookId(), newQuantity);
             }
 
             @Override
-            public void onRemoveItem(int position) {
-                CartManager.getInstance().removeProduct(position);
-                adapter.notifyItemRemoved(position);
-                adapter.notifyItemRangeChanged(position, cartItems.size());
-                updateUI();
+            public void onRemoveItem(CartItemEntity item) {
+                CartManager.getInstance(requireContext()).removeFromCart(item.getBookId());
             }
         });
         binding.rvCart.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvCart.setAdapter(adapter);
     }
 
-    private void updateUI() {
-        if (cartItems.isEmpty()) {
+    private void observeCart() {
+        CartManager.getInstance(requireContext()).getCartItems().observe(getViewLifecycleOwner(), items -> {
+            if (items != null) {
+                currentItems = items;
+                adapter.setData(items);
+                updateUI(items);
+            }
+        });
+    }
+
+    private void updateUI(List<CartItemEntity> items) {
+        if (items == null || items.isEmpty()) {
             binding.layoutEmpty.setVisibility(View.VISIBLE);
             binding.layoutCheckout.setVisibility(View.GONE);
         } else {
             binding.layoutEmpty.setVisibility(View.GONE);
             binding.layoutCheckout.setVisibility(View.VISIBLE);
             
+            long total = 0;
+            for (CartItemEntity item : items) {
+                total += item.getPrice() * item.getQuantity();
+            }
             DecimalFormat formatter = new DecimalFormat("#,###");
-            binding.tvTotalCart.setText(formatter.format(CartManager.getInstance().getTotalAmount()) + "đ");
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        updateUI();
-        if (adapter != null) {
-            adapter.notifyDataSetChanged();
+            binding.tvTotalCart.setText(formatter.format(total) + "đ");
         }
     }
 

@@ -11,16 +11,21 @@ import com.example.appbansach.model.Order;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
     private List<Order> orderList;
+    private OnOrderClickListener listener;
 
-    public OrderAdapter(List<Order> orderList) {
+    public interface OnOrderClickListener {
+        void onOrderClick(Order order);
+    }
+
+    public OrderAdapter(List<Order> orderList, OnOrderClickListener listener) {
         this.orderList = orderList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -59,6 +64,8 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
         DecimalFormat formatter = new DecimalFormat("#,###");
         holder.binding.tvOrderTotal.setText("Tổng tiền: " + formatter.format(order.getTotalAmount() + order.getShippingFee()) + "đ");
+
+        holder.itemView.setOnClickListener(v -> listener.onOrderClick(order));
     }
 
     private String getStatusText(String status) {

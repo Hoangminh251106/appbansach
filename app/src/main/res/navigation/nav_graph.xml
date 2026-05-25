@@ -30,7 +30,16 @@
             app:destination="@id/homeFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_loginFragment_to_forgotPasswordFragment"
+            app:destination="@id/forgotPasswordFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/forgotPasswordFragment"
+        android:name="com.example.appbansach.fragment.ForgotPasswordFragment"
+        android:label="Quên mật khẩu"
+        tools:layout="@layout/fragment_forgot_password" />
 
     <fragment
         android:id="@+id/registerFragment"
@@ -116,18 +125,130 @@
         <action
             android:id="@+id/action_profileFragment_to_editProfileFragment"
             app:destination="@id/editProfileFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_wishlistFragment"
+            app:destination="@id/wishlistFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_adminDashboardFragment"
+            app:destination="@id/adminDashboardFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.example.appbansach.fragment.ChatFragment"
+        android:label="Hỗ trợ"
+        tools:layout="@layout/fragment_chat" />
+
+    <fragment
+        android:id="@+id/wishlistFragment"
+        android:name="com.example.appbansach.fragment.WishlistFragment"
+        android:label="Yêu thích"
+        tools:layout="@layout/fragment_wishlist">
+        <action
+            android:id="@+id/action_wishlistFragment_to_bookDetailFragment"
+            app:destination="@id/bookDetailFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/ordersFragment"
         android:name="com.example.appbansach.fragment.OrdersFragment"
         android:label="Đơn hàng"
-        tools:layout="@layout/fragment_orders" />
+        tools:layout="@layout/fragment_orders">
+        <action
+            android:id="@+id/action_ordersFragment_to_orderDetailFragment"
+            app:destination="@id/orderDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/orderDetailFragment"
+        android:name="com.example.appbansach.fragment.OrderDetailFragment"
+        android:label="Chi tiết đơn hàng"
+        tools:layout="@layout/fragment_order_detail">
+        <argument
+            android:name="orderId"
+            app:argType="string" />
+    </fragment>
 
     <fragment
         android:id="@+id/editProfileFragment"
         android:name="com.example.appbansach.fragment.EditProfileFragment"
         android:label="Chỉnh sửa thông tin"
         tools:layout="@layout/fragment_edit_profile" />
+
+    <!-- Admin Fragments -->
+    <fragment
+        android:id="@+id/adminDashboardFragment"
+        android:name="com.example.appbansach.fragment.AdminDashboardFragment"
+        android:label="Bảng điều khiển"
+        tools:layout="@layout/fragment_admin_dashboard">
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_manageBooksFragment"
+            app:destination="@id/manageBooksFragment" />
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_manageOrdersFragment"
+            app:destination="@id/manageOrdersFragment" />
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_statisticsFragment"
+            app:destination="@id/statisticsFragment" />
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_manageCategoriesFragment"
+            app:destination="@id/manageCategoriesFragment" />
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_manageVouchersFragment"
+            app:destination="@id/manageVouchersFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/manageBooksFragment"
+        android:name="com.example.appbansach.fragment.ManageBooksFragment"
+        android:label="Quản lý Sách"
+        tools:layout="@layout/fragment_manage_books">
+        <action
+            android:id="@+id/action_manageBooksFragment_to_addEditBookFragment"
+            app:destination="@id/addEditBookFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addEditBookFragment"
+        android:name="com.example.appbansach.fragment.AddEditBookFragment"
+        android:label="Thêm/Sửa Sách"
+        tools:layout="@layout/fragment_add_edit_book">
+        <argument
+            android:name="bookId"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="@null" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/manageOrdersFragment"
+        android:name="com.example.appbansach.fragment.ManageOrdersFragment"
+        android:label="Quản lý Đơn hàng"
+        tools:layout="@layout/fragment_manage_orders">
+        <action
+            android:id="@+id/action_manageOrdersFragment_to_orderDetailFragment"
+            app:destination="@id/orderDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/manageCategoriesFragment"
+        android:name="com.example.appbansach.fragment.ManageCategoriesFragment"
+        android:label="Quản lý Danh mục"
+        tools:layout="@layout/fragment_manage_categories" />
+
+    <fragment
+        android:id="@+id/manageVouchersFragment"
+        android:name="com.example.appbansach.fragment.ManageVouchersFragment"
+        android:label="Quản lý Voucher"
+        tools:layout="@layout/fragment_manage_vouchers" />
+
+    <fragment
+        android:id="@+id/statisticsFragment"
+        android:name="com.example.appbansach.fragment.StatisticsFragment"
+        android:label="Thống kê"
+        tools:layout="@layout/fragment_statistics" />
 
 </navigation>

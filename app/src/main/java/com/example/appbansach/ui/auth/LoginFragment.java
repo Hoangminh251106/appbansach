@@ -14,7 +14,6 @@ import androidx.navigation.Navigation;
 
 import com.example.appbansach.R;
 import com.example.appbansach.databinding.FragmentLoginBinding;
-import com.example.appbansach.utils.Resource;
 
 public class LoginFragment extends Fragment {
     private FragmentLoginBinding binding;
@@ -30,7 +29,6 @@ public class LoginFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // Đảm bảo sử dụng AuthViewModel của gói appbansach
         viewModel = new ViewModelProvider(requireActivity()).get(AuthViewModel.class);
 
         binding.btnLogin.setOnClickListener(v -> {
@@ -43,6 +41,9 @@ public class LoginFragment extends Fragment {
             }
             viewModel.login(email, password);
         });
+
+        binding.tvForgotPassword.setOnClickListener(v -> 
+            Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_forgotPasswordFragment));
 
         binding.tvRegister.setOnClickListener(v -> 
             Navigation.findNavController(view).navigate(R.id.action_loginFragment_to_registerFragment));
@@ -62,7 +63,7 @@ public class LoginFragment extends Fragment {
                         binding.progressBar.setVisibility(View.GONE);
                         binding.btnLogin.setEnabled(true);
                         Toast.makeText(getContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
-                        // Chuyển sang Home
+                        // Sửa lại ID action cho chính xác theo nav_graph.xml
                         Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_homeFragment);
                         break;
                     case ERROR:

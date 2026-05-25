@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="24dp"
-    android:gravity="center_horizontal">
+    android:gravity="center_horizontal"
+    android:background="#F8F9FA">
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="120dp"
@@ -19,16 +20,15 @@
             android:id="@+id/ivAvatar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@android:drawable/ic_menu_myplaces"
-            android:padding="20dp"
-            app:tint="?attr/colorPrimary" />
+            android:scaleType="centerCrop"
+            android:src="@android:drawable/ic_menu_myplaces" />
     </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:id="@+id/tvProfileName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Họ và Tên"
+        android:text="Đang tải..."
         android:textSize="22sp"
         android:textStyle="bold"
         android:textColor="@android:color/black"/>
@@ -37,36 +37,64 @@
         android:id="@+id/tvProfileEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="email@example.com"
-        android:textSize="16sp"
+        android:text="..."
+        android:textSize="14sp"
         android:layout_marginBottom="32dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnWishlist"
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Sách yêu thích"
+        android:layout_marginBottom="8dp"
+        android:gravity="start|center_vertical"
+        android:paddingStart="24dp"
+        app:icon="@android:drawable/btn_star_big_on"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnOrderHistory"
         style="@style/Widget.Material3.Button.TonalButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:text="Lịch sử đơn hàng"
         android:layout_marginBottom="8dp"
+        android:gravity="start|center_vertical"
+        android:paddingStart="24dp"
         app:icon="@android:drawable/ic_menu_agenda"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnChatSupport"
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Hỗ trợ trực tuyến"
+        android:layout_marginBottom="8dp"
+        android:gravity="start|center_vertical"
+        android:paddingStart="24dp"
+        app:icon="@android:drawable/stat_notify_chat"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnEditProfile"
         style="@style/Widget.Material3.Button.TonalButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:text="Chỉnh sửa thông tin"
         android:layout_marginBottom="8dp"
+        android:gravity="start|center_vertical"
+        android:paddingStart="24dp"
         app:icon="@android:drawable/ic_menu_edit"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnAdminPanel"
         style="@style/Widget.Material3.Button.TonalButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:text="Quản trị hệ thống"
         android:visibility="gone"
         android:layout_marginBottom="8dp"
+        android:gravity="start|center_vertical"
+        android:paddingStart="24dp"
         app:icon="@android:drawable/ic_lock_lock"/>
 
     <View
@@ -78,7 +106,7 @@
         android:id="@+id/btnLogout"
         style="@style/Widget.Material3.Button"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="56dp"
         android:text="Đăng xuất"
         app:backgroundTint="@android:color/holo_red_dark"
         app:icon="@android:drawable/ic_lock_power_off"/>

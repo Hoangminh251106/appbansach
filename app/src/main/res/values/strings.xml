@@ -52,4 +52,5 @@
     <string name="author_hint">Tác giả</string>
     <string name="price_hint">Giá bán</string>
     <string name="stock_hint">Số lượng trong kho</string>
+    <string name="price_range_label">Khoảng giá</string>
 </resources>

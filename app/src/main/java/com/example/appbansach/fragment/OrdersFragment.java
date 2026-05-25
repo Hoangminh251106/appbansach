@@ -8,8 +8,10 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.example.appbansach.R;
 import com.example.appbansach.adapter.OrderAdapter;
 import com.example.appbansach.databinding.FragmentOrdersBinding;
 import com.example.appbansach.model.Order;
@@ -43,7 +45,12 @@ public class OrdersFragment extends Fragment {
 
     private void setupRecyclerView() {
         orderList = new ArrayList<>();
-        adapter = new OrderAdapter(orderList);
+        adapter = new OrderAdapter(orderList, order -> {
+            // Chuyển sang màn hình chi tiết đơn hàng
+            Bundle bundle = new Bundle();
+            bundle.putString("orderId", order.getOrderId());
+            Navigation.findNavController(requireView()).navigate(R.id.action_ordersFragment_to_orderDetailFragment, bundle);
+        });
         binding.rvOrders.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvOrders.setAdapter(adapter);
     }
@@ -52,7 +59,6 @@ public class OrdersFragment extends Fragment {
         if (mAuth.getCurrentUser() == null) return;
         String userId = mAuth.getCurrentUser().getUid();
         
-        // Sửa từ "Orders" thành "orders" và "timestamp" thành "createdAt" để đồng bộ với OrderRepository
         db.collection("orders")
                 .whereEqualTo("userId", userId)
                 .orderBy("createdAt", Query.Direction.DESCENDING)
