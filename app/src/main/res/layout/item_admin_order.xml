@@ -36,13 +36,14 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnUpdateStatus"
-                style="@style/Widget.Material3.Button.TonalButton"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:text="Cập nhật"
                 android:textSize="12sp"
-                app:chipMinHeight="32dp" />
+                app:backgroundTint="#E3F2FD"
+                android:textColor="?attr/colorPrimary" />
         </RelativeLayout>
 
         <TextView

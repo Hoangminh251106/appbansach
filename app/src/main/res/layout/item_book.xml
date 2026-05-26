@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+    android:layout_width="160dp"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp">
+    app:cardBackgroundColor="@color/card_surface"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="4dp"
+    app:strokeWidth="0dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -16,18 +18,21 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- fitCenter giữ nguyên tỷ lệ bìa sách, không bị vỡ/mờ -->
             <ImageView
                 android:id="@+id/ivBookCover"
                 android:layout_width="match_parent"
-                android:layout_height="160dp"
-                android:scaleType="centerCrop"
+                android:layout_height="220dp"
+                android:scaleType="fitCenter"
+                android:background="#F5F5F5"
+                android:padding="8dp"
                 android:src="@android:drawable/ic_menu_gallery" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="8dp">
+                android:padding="12dp">
 
                 <TextView
                     android:id="@+id/tvBookTitle"
@@ -35,7 +40,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:maxLines="2"
-                    android:textColor="@android:color/black"
+                    android:textColor="@color/text_main"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -43,21 +48,24 @@
                     android:id="@+id/tvAuthor"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/text_secondary"
                     android:textSize="12sp"
-                    android:textColor="#757575" />
+                    android:ellipsize="end"
+                    android:maxLines="1" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginTop="4dp">
+                    android:layout_marginTop="6dp">
 
                     <TextView
                         android:id="@+id/tvPrice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="?attr/colorPrimary"
+                        android:textColor="@color/sage_primary_dark"
                         android:textSize="15sp"
                         android:textStyle="bold" />
 
@@ -67,7 +75,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
                         android:textSize="11sp"
-                        android:alpha="0.6"
+                        android:textColor="@color/text_secondary"
+                        android:alpha="0.7"
                         android:visibility="gone" />
                 </LinearLayout>
 
@@ -89,9 +98,9 @@
             android:layout_height="32dp"
             android:layout_alignParentEnd="true"
             android:layout_margin="8dp"
-            android:background="@drawable/bg_circle_white"
+            android:background="@android:color/transparent"
             android:src="@android:drawable/btn_star_big_off"
-            app:tint="@color/black" />
+            app:tint="@color/sage_primary" />
 
     </RelativeLayout>
 </com.google.android.material.card.MaterialCardView>

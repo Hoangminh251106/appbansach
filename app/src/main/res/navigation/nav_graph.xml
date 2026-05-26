@@ -178,7 +178,6 @@
         android:label="Chỉnh sửa thông tin"
         tools:layout="@layout/fragment_edit_profile" />
 
-    <!-- Admin Fragments -->
     <fragment
         android:id="@+id/adminDashboardFragment"
         android:name="com.example.appbansach.fragment.AdminDashboardFragment"

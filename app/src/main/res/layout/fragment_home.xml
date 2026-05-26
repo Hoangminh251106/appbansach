@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA">
+    android:background="@color/app_background">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
+        android:background="@color/app_background"
         app:elevation="0dp">
 
         <androidx.appcompat.widget.Toolbar
@@ -18,44 +18,33 @@
             android:layout_height="?attr/actionBarSize"
             app:contentInsetStart="0dp">
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
                 android:paddingHorizontal="16dp">
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="BookStore"
-                    android:textColor="@color/black"
+                    android:layout_centerVertical="true"
+                    android:text="READ &amp; CHILL"
+                    android:textColor="@color/text_main"
                     android:textSize="22sp"
                     android:textStyle="bold" />
 
-                <ImageView
-                    android:id="@+id/ivSearch"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    android:layout_marginEnd="16dp"
-                    android:src="@android:drawable/ic_menu_search"
-                    app:tint="@color/black" />
-
-                <FrameLayout
-                    android:id="@+id/btnCart"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:clickable="true"
-                    android:focusable="true">
-
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@android:drawable/ic_input_add"
-                        app:tint="@color/black" />
-                </FrameLayout>
-            </LinearLayout>
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/ivUserAvatar"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:padding="2dp"
+                    android:scaleType="centerCrop"
+                    android:src="@android:drawable/ic_menu_report_image"
+                    app:shapeAppearanceOverlay="@style/CircleImage"
+                    app:strokeColor="@color/sage_primary"
+                    app:strokeWidth="2dp" />
+            </RelativeLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -70,30 +59,30 @@
             android:orientation="vertical"
             android:paddingBottom="80dp">
 
-            <!-- Banner Section - Dùng làm nút kích hoạt dữ liệu mẫu nếu chưa có gì -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="160dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="12dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
+                app:cardBackgroundColor="@color/card_surface"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                app:strokeWidth="0dp">
 
                 <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/viewPagerBanners"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="#E9ECEF" />
+                    android:background="@color/sage_accent" />
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Categories -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="24dp"
                 android:text="Danh mục"
-                android:textColor="@color/black"
+                android:textColor="@color/text_main"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -105,12 +94,11 @@
                 android:clipToPadding="false"
                 android:paddingHorizontal="12dp" />
 
-            <!-- Featured Books Section -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="32dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -119,7 +107,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Sách nổi bật"
-                    android:textColor="@color/black"
+                    android:textColor="@color/text_main"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -129,7 +117,7 @@
                     android:layout_height="wrap_content"
                     android:padding="8dp"
                     android:text="Xem tất cả"
-                    android:textColor="?attr/colorPrimary"
+                    android:textColor="@color/sage_primary_dark"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </LinearLayout>
@@ -142,14 +130,13 @@
                 android:clipToPadding="false"
                 android:paddingHorizontal="12dp" />
 
-            <!-- Newest Books Section -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="32dp"
                 android:text="Sách mới nhất"
-                android:textColor="@color/black"
+                android:textColor="@color/text_main"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -163,5 +150,13 @@
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminateTint="@color/sage_primary"
+        android:visibility="gone" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

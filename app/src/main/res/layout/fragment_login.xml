@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/app_background"
     android:fillViewport="true">
 
     <LinearLayout
@@ -10,53 +11,80 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="24dp">
+        android:padding="32dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
-            android:text="BookStore"
-            android:textColor="?attr/colorPrimary"
+            android:layout_marginBottom="8dp"
+            android:text="READ &amp; CHILL"
+            android:textColor="@color/sage_primary_dark"
             android:textSize="36sp"
             android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
+            android:text="Hiệu sách nhỏ của bạn"
+            android:textColor="@color/text_secondary"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"
+            android:layout_gravity="start"
             android:text="Đăng nhập"
+            android:textColor="@color/text_main"
             android:textSize="24sp"
             android:textStyle="bold" />
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:hint="Email"
-            app:startIconDrawable="@android:drawable/ic_dialog_email">
+            app:startIconDrawable="@android:drawable/ic_dialog_email"
+            app:startIconTint="@color/sage_primary_dark"
+            app:boxStrokeColor="@color/sage_primary"
+            app:hintTextColor="@color/sage_primary_dark"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@color/text_main"
                 android:inputType="textEmailAddress" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:hint="Mật khẩu"
             app:passwordToggleEnabled="true"
-            app:startIconDrawable="@android:drawable/ic_lock_idle_lock">
+            app:passwordToggleTint="@color/sage_primary_dark"
+            app:startIconDrawable="@android:drawable/ic_lock_idle_lock"
+            app:startIconTint="@color/sage_primary_dark"
+            app:boxStrokeColor="@color/sage_primary"
+            app:hintTextColor="@color/sage_primary_dark"
+            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusTopStart="12dp">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@color/text_main"
                 android:inputType="textPassword" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -68,22 +96,24 @@
             android:layout_marginBottom="24dp"
             android:padding="4dp"
             android:text="Quên mật khẩu?"
-            android:textColor="?attr/colorPrimary"
+            android:textColor="@color/sage_primary_dark"
             android:textStyle="bold" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="12dp"
+            android:layout_height="56dp"
             android:text="Đăng nhập"
-            app:cornerRadius="8dp" />
+            android:textColor="@color/white"
+            app:backgroundTint="@color/sage_primary"
+            app:cornerRadius="12dp" />
 
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:indeterminateTint="@color/sage_primary"
             android:visibility="gone" />
 
         <TextView
@@ -93,10 +123,9 @@
             android:layout_marginTop="24dp"
             android:padding="8dp"
             android:text="Chưa có tài khoản? Đăng ký ngay"
-            android:textColor="?attr/colorPrimary"
+            android:textColor="@color/sage_primary_dark"
             android:textStyle="bold" />
 
-        <!-- Quick Login for Testing -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -108,14 +137,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginBottom="16dp"
-                android:background="#DDDDDD" />
+                android:background="@color/divider" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:text="Đăng nhập nhanh (Dành cho Dev)"
-                android:textColor="#888888"
+                android:text="Đăng nhập nhanh"
+                android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
 
             <LinearLayout
@@ -126,24 +155,24 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnQuickAdmin"
-                    style="@style/Widget.Material3.Button.TonalButton"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
                     android:text="Admin"
-                    android:textSize="12sp"
-                    app:icon="@android:drawable/ic_menu_edit" />
+                    android:textColor="@color/sage_primary_dark"
+                    android:textSize="12sp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnQuickUser"
-                    style="@style/Widget.Material3.Button.TonalButton"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="User"
-                    android:textSize="12sp"
-                    app:icon="@android:drawable/ic_menu_myplaces" />
+                    android:textColor="@color/sage_primary_dark"
+                    android:textSize="12sp" />
 
             </LinearLayout>
         </LinearLayout>

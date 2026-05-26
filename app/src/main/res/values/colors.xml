@@ -1,10 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
+    <!-- Màu chủ đạo (Primary) - Xanh Sage hiện đại -->
+    <color name="sage_primary">#A3B18A</color>
+    <color name="sage_primary_dark">#588157</color>
+    <color name="sage_accent">#DAD7CD</color>
+
+    <!-- Màu nền chính (Background) - Trắng kem ngả cát nhẹ -->
+    <color name="app_background">#F8F9F1</color>
+
+    <!-- Màu khối (Card & Surface) - Trắng tinh khiết -->
+    <color name="card_surface">#FFFFFF</color>
+
+    <!-- Màu chữ (Text) - Xám tro/Charcoal -->
+    <color name="text_main">#344E41</color>
+    <color name="text_secondary">#6B705C</color>
+
+    <!-- Màu cơ bản -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="divider">#E9E9E9</color>
+
+    <!-- Màu cũ giữ lại nếu cần cho system -->
+    <color name="purple_200">#A3B18A</color> <!-- Map to Sage -->
+    <color name="purple_500">#588157</color> <!-- Map to Sage Dark -->
+    <color name="purple_700">#344E41</color> <!-- Map to Text Main -->
+    <color name="teal_200">#DAD7CD</color>
 </resources>

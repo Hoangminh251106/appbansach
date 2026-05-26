@@ -5,7 +5,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -40,7 +38,6 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class SearchFragment extends Fragment {
-    private static final String TAG = "SearchFragment";
     private static final String API_KEY = "AIzaSyCFaQyaHAn-95mXvT_2tFNqC2ugEGhquv8";
     private static final String BASE_URL = "https://www.googleapis.com/books/v1/";
 
@@ -68,39 +65,45 @@ public class SearchFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        
-        initRetrofit();
         setupUI();
+        initRetrofit();
         loadCategories();
-        
-        // Trì hoãn nhẹ 500ms để App hiển thị giao diện trước, tránh treo App (ANR)
-        searchHandler.postDelayed(() -> {
-            if (isAdded() && binding != null) loadBooksByCategory("Fiction");
-        }, 500);
+
+        // Xử lý tham số truyền từ Trang chủ
+        if (getArguments() != null) {
+            if (getArguments().containsKey("category_name")) {
+                String category = getArguments().getString("category_name");
+                loadBooksByCategory(category);
+            } else if (getArguments().containsKey("query")) {
+                String query = getArguments().getString("query");
+                binding.etSearch.setText(query);
+                executeApiCall(query);
+            } else {
+                loadBooksByCategory("Fiction");
+            }
+        } else {
+            loadBooksByCategory("Fiction");
+        }
     }
 
     private void initRetrofit() {
-        if (apiService != null) return;
-        
-        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.HEADERS); // Giảm tải log để tăng hiệu năng
-        OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor).build();
-
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
-                .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
         apiService = retrofit.create(BookApiService.class);
     }
 
     private void loadBooksByCategory(String categoryName) {
-        executeApiCall("subject:" + categoryName);
+        if (binding != null) {
+            binding.etSearch.setText(categoryName);
+            // Sửa lỗi: Không dùng "subject:" để tìm kiếm rộng hơn theo ý người dùng
+            executeApiCall(categoryName);
+        }
     }
 
     private void executeApiCall(String query) {
-        if (binding == null) return;
+        if (binding == null || apiService == null) return;
         binding.progressBar.setVisibility(View.VISIBLE);
         
         apiService.searchBooks(query, API_KEY).enqueue(new Callback<GoogleBooksResponse>() {
@@ -118,8 +121,6 @@ public class SearchFragment extends Fragment {
                         }
                     }
                     updateUiList();
-                } else {
-                    Log.e(TAG, "Lỗi API: " + response.code());
                 }
             }
 
@@ -127,14 +128,13 @@ public class SearchFragment extends Fragment {
             public void onFailure(@NonNull Call<GoogleBooksResponse> call, @NonNull Throwable t) {
                 if (!isAdded() || binding == null) return;
                 binding.progressBar.setVisibility(View.GONE);
-                Log.e(TAG, "Network Error", t);
+                Toast.makeText(getContext(), "Không thể kết nối máy chủ", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void setupUI() {
         adapter = new BookAdapter(displayList, book -> {
-            // Lưu tạm vào Firestore để màn hình chi tiết có đầy đủ thông tin
             db.collection("books").document(book.getId()).set(book)
                     .addOnSuccessListener(aVoid -> {
                         if (isAdded() && binding != null) {
@@ -146,7 +146,6 @@ public class SearchFragment extends Fragment {
         });
         binding.rvSearchResults.setLayoutManager(new GridLayoutManager(getContext(), 2));
         binding.rvSearchResults.setAdapter(adapter);
-
         binding.ivBack.setOnClickListener(v -> Navigation.findNavController(v).navigateUp());
 
         binding.etSearch.addTextChangedListener(new TextWatcher() {
@@ -158,7 +157,7 @@ public class SearchFragment extends Fragment {
                 if (query.length() >= 2) {
                     searchHandler.removeCallbacks(searchRunnable);
                     searchRunnable = () -> executeApiCall(query);
-                    searchHandler.postDelayed(searchRunnable, 800); 
+                    searchHandler.postDelayed(searchRunnable, 1000);
                 }
             }
             @Override
@@ -173,29 +172,13 @@ public class SearchFragment extends Fragment {
         });
     }
 
-    private void loadCategories() {
-        db.collection("categories").get().addOnSuccessListener(queryDocumentSnapshots -> {
-            if (!isAdded() || binding == null) return;
-            binding.chipGroupCategories.removeAllViews();
-            
-            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                Category cat = doc.toObject(Category.class);
-                Chip chip = new Chip(requireContext());
-                chip.setText(cat.getName());
-                chip.setCheckable(true);
-                chip.setOnClickListener(v -> loadBooksByCategory(cat.getName()));
-                binding.chipGroupCategories.addView(chip);
-            }
-        });
-    }
-
     private Book convertToBook(GoogleBooksResponse.Item item) {
         Book book = new Book();
         book.setId(item.getId());
         GoogleBooksResponse.VolumeInfo info = item.getVolumeInfo();
         if (info != null) {
             book.setTitle(info.getTitle() != null ? info.getTitle() : "N/A");
-            book.setAuthor(info.getAuthors() != null && !info.getAuthors().isEmpty() ? info.getAuthors().get(0) : "Ẩn danh");
+            book.setAuthor(info.getAuthors() != null && !info.getAuthors().isEmpty() ? info.getAuthors().get(0) : "Unknown");
             book.setDescription(info.getDescription());
             if (info.getImageLinks() != null) {
                 String url = info.getImageLinks().getThumbnail();
@@ -205,7 +188,7 @@ public class SearchFragment extends Fragment {
         if (item.getSaleInfo() != null && item.getSaleInfo().getListPrice() != null) {
             book.setPrice((long) item.getSaleInfo().getListPrice().getAmount());
         } else {
-            book.setPrice(70000 + (long)(Math.random() * 100000));
+            book.setPrice(75000 + (long)(Math.random() * 80000));
         }
         book.setStock(100);
         return book;
@@ -221,6 +204,21 @@ public class SearchFragment extends Fragment {
         }
         adapter.notifyDataSetChanged();
         binding.layoutNoResults.setVisibility(displayList.isEmpty() ? View.VISIBLE : View.GONE);
+    }
+
+    private void loadCategories() {
+        db.collection("categories").get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (!isAdded() || binding == null) return;
+            binding.chipGroupCategories.removeAllViews();
+            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                String name = doc.getString("name");
+                if (name == null) continue;
+                Chip chip = (Chip) getLayoutInflater().inflate(R.layout.item_chip_category, binding.chipGroupCategories, false);
+                chip.setText(name);
+                chip.setOnClickListener(v -> loadBooksByCategory(name));
+                binding.chipGroupCategories.addView(chip);
+            }
+        });
     }
 
     @Override

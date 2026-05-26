@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA">
+    android:background="@color/app_background">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/white"
+        android:background="@color/app_background"
         app:elevation="0dp">
 
         <LinearLayout
@@ -24,7 +24,7 @@
                 android:layout_height="40dp"
                 android:padding="8dp"
                 android:src="@android:drawable/ic_menu_revert"
-                app:tint="@color/black" />
+                app:tint="@color/text_main" />
 
             <com.google.android.material.textfield.TextInputLayout
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
@@ -34,12 +34,16 @@
                 android:layout_marginEnd="8dp"
                 android:hint="Tìm tên sách, tác giả..."
                 app:endIconMode="clear_text"
-                app:startIconDrawable="@android:drawable/ic_menu_search">
+                app:startIconDrawable="@android:drawable/ic_menu_search"
+                app:startIconTint="@color/sage_primary_dark"
+                app:boxStrokeColor="@color/sage_primary"
+                app:hintTextColor="@color/sage_primary_dark">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etSearch"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/text_main"
                     android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
@@ -57,6 +61,7 @@
                 android:text="@string/categories_label"
                 android:textStyle="bold"
                 android:textSize="14sp"
+                android:textColor="@color/text_main"
                 android:layout_marginBottom="4dp"/>
 
             <HorizontalScrollView
@@ -76,6 +81,7 @@
                 android:text="@string/price_range_label"
                 android:textStyle="bold"
                 android:textSize="14sp"
+                android:textColor="@color/text_main"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="4dp"/>
 
@@ -85,6 +91,9 @@
                 android:layout_height="wrap_content"
                 android:valueFrom="0"
                 android:valueTo="1000000"
+                app:thumbColor="@color/sage_primary"
+                app:trackColorActive="@color/sage_primary"
+                app:trackColorInactive="@color/sage_accent"
                 app:values="@array/initial_range_values" />
         </LinearLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -110,13 +119,14 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:src="@android:drawable/ic_menu_search"
-            app:tint="#CCCCCC" />
+            app:tint="@color/sage_accent" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Không tìm thấy kết quả phù hợp"
+            android:textColor="@color/text_secondary"
             android:textSize="16sp" />
     </LinearLayout>
 
@@ -125,6 +135,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:indeterminateTint="@color/sage_primary"
         android:visibility="gone" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

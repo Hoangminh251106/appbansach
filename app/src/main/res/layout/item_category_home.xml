@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:gravity="center"
@@ -7,28 +8,34 @@
     android:padding="8dp">
 
     <com.google.android.material.card.MaterialCardView
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        app:cardCornerRadius="30dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        app:cardCornerRadius="32dp"
         app:cardElevation="2dp"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        app:cardBackgroundColor="@color/card_surface"
+        app:strokeWidth="1dp"
+        app:strokeColor="@color/sage_accent">
 
         <ImageView
             android:id="@+id/ivCategoryIcon"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="12dp"
-            android:scaleType="centerInside" />
+            android:padding="14dp"
+            android:scaleType="centerInside"
+            android:src="@android:drawable/ic_menu_gallery"
+            app:tint="@color/sage_primary_dark" />
     </com.google.android.material.card.MaterialCardView>
 
     <TextView
         android:id="@+id/tvCategoryName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:text="Category"
+        android:textColor="@color/text_main"
+        android:textStyle="bold"
         android:textSize="12sp" />
 
 </LinearLayout>

@@ -14,6 +14,6 @@
         android:title="Giỏ hàng" />
     <item
         android:id="@+id/profileFragment"
-        android:icon="@android:drawable/ic_menu_myplaces"
-        android:title="Cá nhân" />
+        android:icon="@android:drawable/ic_menu_manage"
+        android:title="Cài đặt" />
 </menu>

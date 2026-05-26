@@ -13,6 +13,7 @@ import com.example.appbansach.model.ChatMessage;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -52,7 +53,9 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ChatMessage message = chatList.get(position);
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        String time = message.getTimestamp() != null ? sdf.format(message.getTimestamp().toDate()) : "";
+        
+        // Fix: timestamp is a long, not an object. Compare with 0 and use new Date()
+        String time = message.getTimestamp() != 0 ? sdf.format(new Date(message.getTimestamp())) : "";
 
         if (holder instanceof SentViewHolder) {
             ((SentViewHolder) holder).binding.tvMessage.setText(message.getMessage());

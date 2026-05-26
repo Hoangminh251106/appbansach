@@ -28,15 +28,23 @@ public class MainActivity extends AppCompatActivity {
             NavigationUI.setupWithNavController(binding.bottomNavigation, navController);
 
             navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+                if (binding == null) return;
                 // Tự động ẩn/hiện BottomNavigation ở màn hình Auth và Splash
-                if (destination.getId() == R.id.loginFragment || 
-                    destination.getId() == R.id.registerFragment || 
-                    destination.getId() == R.id.splashFragment) {
+                int id = destination.getId();
+                if (id == R.id.loginFragment || 
+                    id == R.id.registerFragment || 
+                    id == R.id.splashFragment) {
                     binding.bottomNavigation.setVisibility(View.GONE);
                 } else {
                     binding.bottomNavigation.setVisibility(View.VISIBLE);
                 }
             });
         }
+    }
+    
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        binding = null;
     }
 }

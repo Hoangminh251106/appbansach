@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5">
+    android:background="@color/app_background">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvCart"
@@ -27,13 +27,14 @@
             android:layout_width="120dp"
             android:layout_height="120dp"
             android:src="@android:drawable/ic_menu_delete"
-            app:tint="#CCCCCC" />
+            app:tint="@color/sage_accent" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="Giỏ hàng của bạn đang trống"
+            android:textColor="@color/text_secondary"
             android:textSize="18sp" />
     </LinearLayout>
 
@@ -42,6 +43,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        app:cardBackgroundColor="@color/card_surface"
         app:cardCornerRadius="0dp"
         app:cardElevation="16dp">
 
@@ -60,6 +62,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Tổng cộng:"
+                    android:textColor="@color/text_main"
                     android:textSize="18sp"
                     android:textStyle="bold" />
 
@@ -69,17 +72,20 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"
                     android:text="0đ"
-                    android:textColor="?attr/colorPrimary"
+                    android:textColor="@color/sage_primary_dark"
                     android:textSize="18sp"
                     android:textStyle="bold" />
             </RelativeLayout>
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnProceedCheckout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="12dp"
-                android:text="Tiến hành thanh toán" />
+                android:text="Tiến hành thanh toán"
+                android:textColor="@color/white"
+                app:backgroundTint="@color/sage_primary"
+                app:cornerRadius="12dp" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

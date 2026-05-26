@@ -3,23 +3,25 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA">
+    android:background="@color/app_background">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/white"
+        android:background="@color/app_background"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@android:drawable/ic_menu_revert"
+        app:navigationIconTint="@color/text_main"
         app:title="Hỗ trợ trực tuyến"
-        app:titleTextColor="@color/black" />
+        app:titleTextColor="@color/text_main" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvChat"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:padding="8dp"
+        android:clipToPadding="false"
+        android:padding="12dp"
         app:layout_constraintBottom_toTopOf="@id/layoutInput"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
@@ -27,8 +29,9 @@
         android:id="@+id/layoutInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:elevation="8dp"
+        android:background="@color/card_surface"
+        android:elevation="12dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent">
@@ -40,6 +43,8 @@
             android:layout_weight="1"
             android:background="@android:color/transparent"
             android:hint="Nhập tin nhắn..."
+            android:textColor="@color/text_main"
+            android:textColorHint="@color/text_secondary"
             android:maxLines="4"
             android:padding="12dp" />
 
@@ -49,7 +54,7 @@
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@android:drawable/ic_menu_send"
-            app:tint="?attr/colorPrimary" />
+            app:tint="@color/sage_primary" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

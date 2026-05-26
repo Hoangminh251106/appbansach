@@ -5,14 +5,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="20dp"
-    android:background="#FFFFFF">
+    android:background="@color/app_background">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:navigationIcon="@android:drawable/ic_menu_revert"
+        app:navigationIconTint="@color/text_main"
         app:title="Chỉnh sửa thông tin"
+        app:titleTextColor="@color/text_main"
         android:layout_marginBottom="20dp"/>
 
     <com.google.android.material.card.MaterialCardView
@@ -22,8 +24,9 @@
         android:layout_gravity="center"
         android:layout_marginBottom="24dp"
         app:cardCornerRadius="60dp"
+        app:cardBackgroundColor="@color/card_surface"
         app:strokeWidth="2dp"
-        app:strokeColor="?attr/colorPrimary">
+        app:strokeColor="@color/sage_primary">
 
         <ImageView
             android:id="@+id/ivEditAvatar"
@@ -32,7 +35,7 @@
             android:scaleType="centerCrop"
             android:src="@android:drawable/ic_menu_myplaces"
             android:padding="20dp"
-            app:tint="?attr/colorPrimary" />
+            app:tint="@color/sage_primary" />
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -40,11 +43,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Họ và tên"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="16dp"
+        app:boxStrokeColor="@color/sage_primary"
+        app:hintTextColor="@color/sage_primary_dark"
+        app:startIconTint="@color/sage_primary_dark"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusTopStart="12dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etFullName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/text_main"
             android:inputType="textPersonName" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -53,11 +64,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Số điện thoại"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="16dp"
+        app:boxStrokeColor="@color/sage_primary"
+        app:hintTextColor="@color/sage_primary_dark"
+        app:startIconTint="@color/sage_primary_dark"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusTopStart="12dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etPhone"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/text_main"
             android:inputType="phone" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -66,11 +85,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Địa chỉ"
-        android:layout_marginBottom="32dp">
+        android:layout_marginBottom="32dp"
+        app:boxStrokeColor="@color/sage_primary"
+        app:hintTextColor="@color/sage_primary_dark"
+        app:startIconTint="@color/sage_primary_dark"
+        app:boxCornerRadiusBottomEnd="12dp"
+        app:boxCornerRadiusBottomStart="12dp"
+        app:boxCornerRadiusTopEnd="12dp"
+        app:boxCornerRadiusTopStart="12dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etAddress"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/text_main"
             android:inputType="textPostalAddress" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -79,7 +106,9 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:text="Lưu thay đổi"
-        app:cornerRadius="8dp" />
+        android:textColor="@color/white"
+        app:backgroundTint="@color/sage_primary"
+        app:cornerRadius="12dp" />
 
     <ProgressBar
         android:id="@+id/progressBar"
@@ -87,6 +116,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="20dp"
+        android:indeterminateTint="@color/sage_primary"
         android:visibility="gone" />
 
 </LinearLayout>
