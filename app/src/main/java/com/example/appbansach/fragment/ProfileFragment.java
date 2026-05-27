@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
@@ -100,16 +101,27 @@ public class ProfileFragment extends Fragment {
             startActivity(new Intent(getActivity(), ManageSettingsActivity.class)));
 
         // --- Nút Đăng xuất cho Admin ---
-        binding.btnAdminLogout.setOnClickListener(v -> performLogout(v));
-        binding.btnAdminLogoutLarge.setOnClickListener(v -> performLogout(v));
+        binding.btnAdminLogout.setOnClickListener(this::showLogoutConfirmation);
+        binding.btnAdminLogoutLarge.setOnClickListener(this::showLogoutConfirmation);
 
         // --- Nút Đăng xuất cho User (Nút đỏ dưới cùng) ---
-        binding.btnLogout.setOnClickListener(v -> performLogout(v));
+        binding.btnLogout.setOnClickListener(this::showLogoutConfirmation);
+    }
+
+    private void showLogoutConfirmation(View v) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Đăng xuất")
+                .setMessage("Bạn có chắc chắn muốn đăng xuất không?")
+                .setPositiveButton("Đăng xuất", (dialog, which) -> performLogout(v))
+                .setNegativeButton("Hủy", null)
+                .setIcon(android.R.drawable.ic_lock_power_off)
+                .show();
     }
 
     private void performLogout(View v) {
         mAuth.signOut();
-        showToast("Đã đăng xuất");
+        showToast("Đã đăng xuất thành công");
+        // Điều hướng về màn hình Login và xóa toàn bộ stack cũ
         Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_loginFragment);
     }
 

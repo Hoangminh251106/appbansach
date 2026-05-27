@@ -201,4 +201,15 @@
         android:layout_height="wrap_content"
         android:text="Quay lại giao diện khách hàng" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAdminLogout"
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đăng xuất"
+        android:textColor="#D60000"
+        app:icon="@android:drawable/ic_lock_power_off"
+        app:iconTint="#D60000"
+        android:layout_marginTop="8dp"/>
+
 </LinearLayout>
