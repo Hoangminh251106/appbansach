@@ -14,6 +14,7 @@ import androidx.navigation.Navigation;
 
 import com.example.appbansach.R;
 import com.example.appbansach.databinding.FragmentLoginBinding;
+import com.example.appbansach.model.User;
 
 public class LoginFragment extends Fragment {
     private FragmentLoginBinding binding;
@@ -63,8 +64,15 @@ public class LoginFragment extends Fragment {
                         binding.progressBar.setVisibility(View.GONE);
                         binding.btnLogin.setEnabled(true);
                         Toast.makeText(getContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
-                        // Sửa lại ID action cho chính xác theo nav_graph.xml
-                        Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_homeFragment);
+                        
+                        User user = resource.data;
+                        if (user != null && "admin".equals(user.getRole())) {
+                            // Nếu là admin, chuyển thẳng đến Profile (nơi chứa menu quản lý)
+                            Navigation.findNavController(requireView()).navigate(R.id.profileFragment);
+                        } else {
+                            // Nếu là khách hàng, chuyển đến Home
+                            Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_homeFragment);
+                        }
                         break;
                     case ERROR:
                         binding.progressBar.setVisibility(View.GONE);

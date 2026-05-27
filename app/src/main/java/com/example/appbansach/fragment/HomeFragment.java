@@ -24,6 +24,7 @@ import com.example.appbansach.databinding.FragmentHomeBinding;
 import com.example.appbansach.model.Book;
 import com.example.appbansach.model.Category;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -63,6 +64,10 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        
+        // Kiểm tra quyền truy cập ngay khi vào trang chủ
+        checkAdminAccess();
+        
         setupRecyclerViews();
         setupListeners();
         loadUserAvatar();
@@ -70,9 +75,25 @@ public class HomeFragment extends Fragment {
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (isAdded()) {
                 loadCategories();
-                fetchBooksForHome("sách tiếng việt"); // Thay đổi query mặc định sang tiếng Việt
+                fetchBooksForHome("sách tiếng việt");
             }
         }, 500);
+    }
+
+    private void checkAdminAccess() {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            db.collection("users").document(currentUser.getUid()).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (isAdded() && documentSnapshot.exists()) {
+                        String role = documentSnapshot.getString("role");
+                        if ("admin".equals(role)) {
+                            // Nếu là admin, không cho phép ở Trang chủ, đẩy về Profile (Quản lý)
+                            Navigation.findNavController(requireView()).navigate(R.id.profileFragment);
+                        }
+                    }
+                });
+        }
     }
 
     private void initRetrofit() {
@@ -123,14 +144,11 @@ public class HomeFragment extends Fragment {
                         List<Book> filteredBooks = new ArrayList<>();
                         for (GoogleBooksResponse.Item item : items) {
                             Book book = convertToBook(item);
-                            
-                            // Lọc sách Tiếng Việt: Kiểm tra title chứa dấu tiếng Việt hoặc các từ thông dụng
                             if (isVietnamese(book.getTitle()) || isVietnamese(book.getDescription())) {
                                 filteredBooks.add(book);
                             }
                         }
                         
-                        // Nếu sau khi lọc quá ít, lấy thêm sách phổ thông để tránh trắng màn hình
                         if (filteredBooks.size() < 4) {
                            for (GoogleBooksResponse.Item item : items) {
                                Book b = convertToBook(item);
@@ -153,7 +171,6 @@ public class HomeFragment extends Fragment {
 
     private boolean isVietnamese(String text) {
         if (text == null) return false;
-        // Kiểm tra cơ bản: chứa các nguyên âm có dấu của tiếng Việt
         String regex = ".*[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ].*";
         return text.toLowerCase().matches(regex);
     }

@@ -134,6 +134,21 @@
         <action
             android:id="@+id/action_profileFragment_to_chatFragment"
             app:destination="@id/chatFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_manageBooksFragment"
+            app:destination="@id/manageBooksFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_manageCategoriesFragment"
+            app:destination="@id/manageCategoriesFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_manageOrdersFragment"
+            app:destination="@id/manageOrdersFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_manageVouchersFragment"
+            app:destination="@id/manageVouchersFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_statisticsFragment"
+            app:destination="@id/statisticsFragment" />
     </fragment>
 
     <fragment

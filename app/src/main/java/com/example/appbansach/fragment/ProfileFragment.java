@@ -1,6 +1,5 @@
 package com.example.appbansach.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -18,7 +17,6 @@ import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
 import com.example.appbansach.R;
-import com.example.appbansach.activity.LoginActivity;
 import com.example.appbansach.databinding.FragmentProfileBinding;
 import com.example.appbansach.model.User;
 import com.google.firebase.auth.AuthCredential;
@@ -40,43 +38,79 @@ public class ProfileFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
 
         loadUserProfile();
-
-        // 4. TÁI CẤU TRÚC TAB "CÀI ĐẶT" VÀ THÊM ĐỔI MẬT KHẨU
-        binding.btnPersonalInfo.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_editProfileFragment);
-        });
-
-        binding.btnUpdatePassword.setOnClickListener(v -> showChangePasswordDialog());
-
-        binding.btnWishlist.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_wishlistFragment);
-        });
-
-        binding.btnChatSupport.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_chatFragment);
-        });
-
-        binding.btnAdminPanel.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_adminDashboardFragment);
-        });
-
-        binding.btnOrderHistory.setOnClickListener(v -> {
-            Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_ordersFragment);
-        });
-
-        binding.btnLogout.setOnClickListener(v -> {
-            mAuth.signOut();
-            startActivity(new Intent(getActivity(), LoginActivity.class));
-            getActivity().finish();
-        });
+        setupClickListeners();
 
         return binding.getRoot();
+    }
+
+    private void setupClickListeners() {
+        // --- Click cho Menu Người dùng ---
+        binding.btnPersonalInfo.setOnClickListener(v -> 
+            Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_editProfileFragment));
+
+        // Lưu ý: Các nút khác cho User có thể được thêm vào layoutUserMenu nếu cần
+
+        // --- Click cho Menu Admin Dashboard ---
+        binding.cardManageBooks.setOnClickListener(v -> 
+            Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_manageBooksFragment));
+
+        binding.cardManageCategories.setOnClickListener(v -> 
+            Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_manageCategoriesFragment));
+
+        binding.cardManageOrders.setOnClickListener(v -> 
+            Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_manageOrdersFragment));
+
+        binding.cardManageVouchers.setOnClickListener(v -> 
+            Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_manageVouchersFragment));
+
+        binding.cardStatistics.setOnClickListener(v -> 
+            Navigation.findNavController(v).navigate(R.id.action_profileFragment_to_statisticsFragment));
+
+        binding.btnAdminLogout.setOnClickListener(v -> {
+            mAuth.signOut();
+            Navigation.findNavController(v).navigate(R.id.loginFragment);
+        });
+
+        binding.btnCustomerMode.setOnClickListener(v -> {
+            // Chuyển sang Trang chủ (Khách hàng)
+            Navigation.findNavController(v).navigate(R.id.homeFragment);
+        });
+
+        // --- Logout cho User ---
+        binding.btnLogout.setOnClickListener(v -> {
+            mAuth.signOut();
+            Navigation.findNavController(v).navigate(R.id.loginFragment);
+        });
+    }
+
+    private void loadUserProfile() {
+        if (mAuth.getCurrentUser() == null) return;
+        String userId = mAuth.getCurrentUser().getUid();
+        db.collection("users").document(userId).addSnapshotListener((documentSnapshot, error) -> {
+            if (isAdded() && documentSnapshot != null && documentSnapshot.exists()) {
+                User user = documentSnapshot.toObject(User.class);
+                if (user != null) {
+                    if ("admin".equals(user.getRole())) {
+                        binding.tvAdminName.setText(user.getFullName());
+                        binding.layoutUserMenu.setVisibility(View.GONE);
+                        binding.layoutAdminMenu.setVisibility(View.VISIBLE);
+                    } else {
+                        binding.tvProfileName.setText(user.getFullName());
+                        binding.tvProfileEmail.setText(user.getEmail());
+                        if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
+                            Glide.with(this).load(user.getAvatarUrl()).placeholder(android.R.drawable.ic_menu_myplaces).into(binding.ivAvatar);
+                        }
+                        binding.layoutUserMenu.setVisibility(View.VISIBLE);
+                        binding.layoutAdminMenu.setVisibility(View.GONE);
+                    }
+                }
+            }
+        });
     }
 
     private void showChangePasswordDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Cập nhật mật khẩu");
-
         LinearLayout layout = new LinearLayout(requireContext());
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setPadding(50, 40, 50, 10);
@@ -97,12 +131,10 @@ public class ProfileFragment extends Fragment {
         layout.addView(confirmPass);
 
         builder.setView(layout);
-
         builder.setPositiveButton("Cập nhật", (dialog, which) -> {
             String op = oldPass.getText().toString();
             String np = newPass.getText().toString();
             String cp = confirmPass.getText().toString();
-
             if (np.length() < 6) {
                 Toast.makeText(getContext(), "Mật khẩu mới phải từ 6 ký tự", Toast.LENGTH_SHORT).show();
                 return;
@@ -111,7 +143,6 @@ public class ProfileFragment extends Fragment {
                 Toast.makeText(getContext(), "Xác nhận mật khẩu không khớp", Toast.LENGTH_SHORT).show();
                 return;
             }
-
             updatePasswordLogic(op, np);
         });
         builder.setNegativeButton("Hủy", null);
@@ -132,24 +163,6 @@ public class ProfileFragment extends Fragment {
                 }
             });
         }
-    }
-
-    private void loadUserProfile() {
-        if (mAuth.getCurrentUser() == null) return;
-        String userId = mAuth.getCurrentUser().getUid();
-        db.collection("users").document(userId).addSnapshotListener((documentSnapshot, error) -> {
-            if (isAdded() && documentSnapshot != null && documentSnapshot.exists()) {
-                User user = documentSnapshot.toObject(User.class);
-                if (user != null) {
-                    binding.tvProfileName.setText(user.getFullName());
-                    binding.tvProfileEmail.setText(user.getEmail());
-                    if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
-                        Glide.with(this).load(user.getAvatarUrl()).placeholder(android.R.drawable.ic_menu_myplaces).into(binding.ivAvatar);
-                    }
-                    binding.btnAdminPanel.setVisibility("admin".equals(user.getRole()) ? View.VISIBLE : View.GONE);
-                }
-            }
-        });
     }
 
     @Override

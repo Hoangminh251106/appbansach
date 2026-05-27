@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import com.example.appbansach.R;
 import com.example.appbansach.databinding.FragmentSplashBinding;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class SplashFragment extends Fragment {
     private FragmentSplashBinding binding;
@@ -27,19 +28,15 @@ public class SplashFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         
-        // Nghỉ 800ms để hệ thống kịp vẽ giao diện Splash trước khi chuyển màn hình
+        // Luôn chuyển đến màn hình Đăng nhập khi vừa vào App
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (isAdded() && binding != null) {
-                try {
-                    Navigation.findNavController(requireView()).navigate(R.id.action_splashFragment_to_loginFragment);
-                } catch (Exception e) {
-                    // Nếu lỗi điều hướng, thử lại sau 1s
-                    new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                        if (isAdded()) Navigation.findNavController(requireView()).navigate(R.id.action_splashFragment_to_loginFragment);
-                    }, 1000);
-                }
+                // Đăng xuất tài khoản cũ nếu muốn luôn hiện màn hình login (tùy chọn)
+                // FirebaseAuth.getInstance().signOut(); 
+                
+                Navigation.findNavController(requireView()).navigate(R.id.action_splashFragment_to_loginFragment);
             }
-        }, 800);
+        }, 1200);
     }
 
     @Override
