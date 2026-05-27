@@ -16,12 +16,14 @@
     <string name="nav_home">Trang chủ</string>
     <string name="nav_search">Tìm kiếm</string>
     <string name="nav_cart">Giỏ hàng</string>
-    <string name="nav_profile">Cá nhân</string>
+    <string name="nav_profile">Cài đặt</string>
 
     <!-- Home -->
     <string name="categories_label">Danh mục</string>
     <string name="featured_books_label">Sách nổi bật</string>
     <string name="newest_books_label">Sách mới nhất</string>
+    <string name="best_selling_label">Sách bán chạy</string>
+    <string name="most_liked_label">Sách được yêu thích nhất</string>
 
     <!-- Cart & Checkout -->
     <string name="cart_empty">Giỏ hàng của bạn đang trống</string>
@@ -35,11 +37,18 @@
     <string name="shipping_fee">Phí vận chuyển:</string>
     <string name="place_order">Đặt hàng</string>
 
-    <!-- Profile -->
+    <!-- Profile & Orders -->
     <string name="order_history">Lịch sử đơn hàng</string>
     <string name="edit_profile">Chỉnh sửa thông tin</string>
     <string name="logout">Đăng xuất</string>
     <string name="admin_panel">Quản trị hệ thống</string>
+    <string name="order_status">Trạng thái đơn hàng</string>
+    <string name="shipping_address">Địa chỉ nhận hàng</string>
+    <string name="purchased_products">Sản phẩm đã mua</string>
+    <string name="cancel_order">Hủy đơn hàng</string>
+    <string name="cancel_order_confirm">Bạn có chắc chắn muốn hủy đơn hàng này không?</string>
+    <string name="order_processing_note">Đơn hàng của bạn đang được Shop tiếp nhận và dự kiến xử lý trong vòng 24 giờ tới.</string>
+    <string name="cancel_note_hint">* Bạn chỉ có thể hủy đơn hàng khi trạng thái là Chờ duyệt</string>
 
     <!-- Admin -->
     <string name="admin_dashboard">Bảng điều khiển Admin</string>

@@ -22,8 +22,17 @@ public interface CartDao {
     @Query("UPDATE cart_items SET quantity = :quantity WHERE bookId = :bookId")
     void updateQuantity(String bookId, int quantity);
 
+    @Query("UPDATE cart_items SET selected = :isSelected WHERE bookId = :bookId")
+    void updateSelection(String bookId, boolean isSelected);
+
+    @Query("UPDATE cart_items SET selected = :isSelected")
+    void updateAllSelection(boolean isSelected);
+
     @Query("DELETE FROM cart_items WHERE bookId = :bookId")
     void deleteItem(String bookId);
+
+    @Query("DELETE FROM cart_items WHERE selected = 1")
+    void deleteSelectedItems();
 
     @Query("DELETE FROM cart_items")
     void clearCart();

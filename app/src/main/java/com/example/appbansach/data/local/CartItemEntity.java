@@ -1,6 +1,7 @@
 package com.example.appbansach.data.local;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 @Entity(tableName = "cart_items")
@@ -12,13 +13,18 @@ public class CartItemEntity {
     private String imageUrl;
     private long price;
     private int quantity;
+    private boolean selected = true; // Default selected for checkout
 
+    public CartItemEntity() {}
+
+    @Ignore
     public CartItemEntity(String bookId, String title, String imageUrl, long price, int quantity) {
         this.bookId = bookId;
         this.title = title;
         this.imageUrl = imageUrl;
         this.price = price;
         this.quantity = quantity;
+        this.selected = true;
     }
 
     public int getId() { return id; }
@@ -33,4 +39,6 @@ public class CartItemEntity {
     public void setPrice(long price) { this.price = price; }
     public int getQuantity() { return quantity; }
     public void setQuantity(int quantity) { this.quantity = quantity; }
+    public boolean isSelected() { return selected; }
+    public void setSelected(boolean selected) { this.selected = selected; }
 }

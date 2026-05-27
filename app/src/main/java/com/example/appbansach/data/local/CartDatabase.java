@@ -9,7 +9,7 @@ import androidx.room.RoomDatabase;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {CartItemEntity.class}, version = 1, exportSchema = false)
+@Database(entities = {CartItemEntity.class}, version = 2, exportSchema = false)
 public abstract class CartDatabase extends RoomDatabase {
     public abstract CartDao cartDao();
 
@@ -24,6 +24,7 @@ public abstract class CartDatabase extends RoomDatabase {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
                                     CartDatabase.class, "cart_database")
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }

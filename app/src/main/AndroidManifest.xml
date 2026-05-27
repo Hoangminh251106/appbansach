@@ -32,6 +32,7 @@
         <activity android:name="com.example.appbansach.activity.LoginActivity" />
         <activity android:name="com.example.appbansach.activity.RegisterActivity" />
         <activity android:name="com.example.appbansach.activity.CheckoutActivity" />
+        <activity android:name="com.example.appbansach.activity.PaymentQRActivity" />
 
     </application>
 

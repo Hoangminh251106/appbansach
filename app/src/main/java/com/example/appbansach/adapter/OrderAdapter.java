@@ -21,6 +21,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
     public interface OnOrderClickListener {
         void onOrderClick(Order order);
+        void onDeleteClick(Order order);
     }
 
     public OrderAdapter(List<Order> orderList, OnOrderClickListener listener) {
@@ -63,9 +64,11 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
         holder.binding.tvOrderItems.setText(itemsSummary.toString());
 
         DecimalFormat formatter = new DecimalFormat("#,###");
-        holder.binding.tvOrderTotal.setText("Tổng tiền: " + formatter.format(order.getTotalAmount() + order.getShippingFee()) + "đ");
+        holder.binding.tvOrderTotal.setText("Tổng tiền: " + formatter.format(order.getTotalAmount()) + "đ");
 
         holder.itemView.setOnClickListener(v -> listener.onOrderClick(order));
+        
+        holder.binding.btnDeleteOrder.setOnClickListener(v -> listener.onDeleteClick(order));
     }
 
     private String getStatusText(String status) {

@@ -62,6 +62,18 @@ public class CartManager {
         return cartDao.getAllCartItems();
     }
 
+    public void updateSelection(String bookId, boolean isSelected) {
+        CartDatabase.databaseWriteExecutor.execute(() -> {
+            cartDao.updateSelection(bookId, isSelected);
+        });
+    }
+
+    public void updateAllSelection(boolean isSelected) {
+        CartDatabase.databaseWriteExecutor.execute(() -> {
+            cartDao.updateAllSelection(isSelected);
+        });
+    }
+
     // Tải dữ liệu từ Firestore về Room (Dùng khi đăng nhập)
     public void fetchCartFromCloud() {
         if (mAuth.getCurrentUser() == null) return;
@@ -109,6 +121,13 @@ public class CartManager {
     public void removeFromCart(String bookId) {
         CartDatabase.databaseWriteExecutor.execute(() -> {
             cartDao.deleteItem(bookId);
+            syncCartToCloud();
+        });
+    }
+
+    public void deleteSelectedItems() {
+        CartDatabase.databaseWriteExecutor.execute(() -> {
+            cartDao.deleteSelectedItems();
             syncCartToCloud();
         });
     }

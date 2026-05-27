@@ -20,6 +20,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     public interface OnCartItemChangeListener {
         void onQuantityChange(CartItemEntity item, int newQuantity);
         void onRemoveItem(CartItemEntity item);
+        void onSelectionChange(CartItemEntity item, boolean isSelected);
     }
 
     public CartAdapter(List<CartItemEntity> cartItems, OnCartItemChangeListener listener) {
@@ -42,6 +43,8 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
     @Override
     public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
         CartItemEntity item = cartItems.get(position);
+        
+        holder.binding.cbSelect.setChecked(item.isSelected());
         holder.binding.tvCartTitle.setText(item.getTitle());
         
         DecimalFormat formatter = new DecimalFormat("#,###");
@@ -53,6 +56,11 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
                 .placeholder(android.R.drawable.ic_menu_gallery)
                 .into(holder.binding.ivCartBook);
 
+        holder.binding.cbSelect.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            item.setSelected(isChecked);
+            listener.onSelectionChange(item, isChecked);
+        });
+
         holder.binding.btnPlus.setOnClickListener(v -> {
             listener.onQuantityChange(item, item.getQuantity() + 1);
         });
@@ -63,6 +71,10 @@ public class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder
             } else {
                 listener.onRemoveItem(item);
             }
+        });
+
+        holder.binding.btnRemove.setOnClickListener(v -> {
+            listener.onRemoveItem(item);
         });
     }
 

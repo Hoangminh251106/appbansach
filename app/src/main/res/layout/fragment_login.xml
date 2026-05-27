@@ -13,6 +13,14 @@
         android:orientation="vertical"
         android:padding="32dp">
 
+        <ImageView
+            android:id="@+id/ivLogo"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_marginBottom="16dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_launcher_foreground" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -30,30 +38,14 @@
             android:textColor="@color/text_secondary"
             android:textSize="16sp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
-            android:layout_gravity="start"
-            android:text="Đăng nhập"
-            android:textColor="@color/text_main"
-            android:textSize="24sp"
-            android:textStyle="bold" />
-
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:hint="Email"
             app:startIconDrawable="@android:drawable/ic_dialog_email"
-            app:startIconTint="@color/sage_primary_dark"
-            app:boxStrokeColor="@color/sage_primary"
-            app:hintTextColor="@color/sage_primary_dark"
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusTopStart="12dp">
+            app:startIconTint="@color/sage_primary_dark">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etEmail"
@@ -64,7 +56,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
@@ -72,13 +64,7 @@
             app:passwordToggleEnabled="true"
             app:passwordToggleTint="@color/sage_primary_dark"
             app:startIconDrawable="@android:drawable/ic_lock_idle_lock"
-            app:startIconTint="@color/sage_primary_dark"
-            app:boxStrokeColor="@color/sage_primary"
-            app:hintTextColor="@color/sage_primary_dark"
-            app:boxCornerRadiusBottomEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusTopStart="12dp">
+            app:startIconTint="@color/sage_primary_dark">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPassword"
@@ -93,7 +79,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="32dp"
             android:padding="4dp"
             android:text="Quên mật khẩu?"
             android:textColor="@color/sage_primary_dark"
@@ -108,14 +94,6 @@
             app:backgroundTint="@color/sage_primary"
             app:cornerRadius="12dp" />
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:indeterminateTint="@color/sage_primary"
-            android:visibility="gone" />
-
         <TextView
             android:id="@+id/tvRegister"
             android:layout_width="wrap_content"
@@ -126,56 +104,13 @@
             android:textColor="@color/sage_primary_dark"
             android:textStyle="bold" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginBottom="16dp"
-                android:background="@color/divider" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:text="Đăng nhập nhanh"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnQuickAdmin"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
-                    android:text="Admin"
-                    android:textColor="@color/sage_primary_dark"
-                    android:textSize="12sp" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnQuickUser"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="User"
-                    android:textColor="@color/sage_primary_dark"
-                    android:textSize="12sp" />
-
-            </LinearLayout>
-        </LinearLayout>
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
+            app:indicatorColor="@color/sage_primary" />
 
     </LinearLayout>
 </ScrollView>

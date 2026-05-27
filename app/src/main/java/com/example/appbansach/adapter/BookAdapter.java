@@ -25,6 +25,7 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
     private List<String> wishlistIds = new ArrayList<>();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String userId = FirebaseAuth.getInstance().getUid();
+    private boolean isGridMode = false;
 
     public interface OnBookClickListener {
         void onBookClick(Book book);
@@ -34,6 +35,10 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
         this.bookList = bookList;
         this.listener = listener;
         fetchWishlist();
+    }
+
+    public void setGridMode(boolean gridMode) {
+        this.isGridMode = gridMode;
     }
 
     private void fetchWishlist() {
@@ -59,6 +64,14 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
     @Override
     public void onBindViewHolder(@NonNull BookViewHolder holder, int position) {
         Book book = bookList.get(position);
+        
+        // Điều chỉnh chiều rộng item nếu ở chế độ Grid
+        if (isGridMode) {
+            ViewGroup.LayoutParams params = holder.itemView.getLayoutParams();
+            params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            holder.itemView.setLayoutParams(params);
+        }
+
         holder.binding.tvBookTitle.setText(book.getTitle());
         holder.binding.tvAuthor.setText(book.getAuthor());
         
@@ -69,6 +82,8 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
             holder.binding.tvOriginalPrice.setVisibility(android.view.View.VISIBLE);
             holder.binding.tvOriginalPrice.setText(formatter.format(book.getOriginalPrice()) + "đ");
             holder.binding.tvOriginalPrice.setPaintFlags(holder.binding.tvOriginalPrice.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+        } else {
+            holder.binding.tvOriginalPrice.setVisibility(android.view.View.GONE);
         }
 
         Glide.with(holder.itemView.getContext())
@@ -76,19 +91,22 @@ public class BookAdapter extends RecyclerView.Adapter<BookAdapter.BookViewHolder
                 .placeholder(android.R.drawable.ic_menu_gallery)
                 .into(holder.binding.ivBookCover);
         
-        // Xử lý Wishlist icon
+
         boolean isFavorite = wishlistIds.contains(book.getId());
-        holder.binding.btnWishlist.setImageResource(isFavorite ? android.R.drawable.btn_star_big_on : android.R.drawable.btn_star_big_off);
+        holder.binding.btnWishlist.setImageResource(isFavorite ? R.drawable.ic_heart_filled : R.drawable.ic_heart_outline);
         
         holder.binding.btnWishlist.setOnClickListener(v -> {
             if (userId == null) {
-                Toast.makeText(v.getContext(), "Vui lòng đăng nhập", Toast.LENGTH_SHORT).show();
+                Toast.makeText(v.getContext(), "Vui lòng đăng nhập để yêu thích!", Toast.LENGTH_SHORT).show();
                 return;
             }
             if (isFavorite) {
-                db.collection("users").document(userId).update("wishlist", FieldValue.arrayRemove(book.getId()));
+                db.collection("users").document(userId).update("wishlist", FieldValue.arrayRemove(book.getId()))
+                        .addOnSuccessListener(aVoid -> Toast.makeText(v.getContext(), "Đã bỏ yêu thích", Toast.LENGTH_SHORT).show());
             } else {
-                db.collection("users").document(userId).update("wishlist", FieldValue.arrayUnion(book.getId()));
+                db.collection("books").document(book.getId()).set(book);
+                db.collection("users").document(userId).update("wishlist", FieldValue.arrayUnion(book.getId()))
+                        .addOnSuccessListener(aVoid -> Toast.makeText(v.getContext(), "Đã thêm vào yêu thích ❤️", Toast.LENGTH_SHORT).show());
             }
         });
 

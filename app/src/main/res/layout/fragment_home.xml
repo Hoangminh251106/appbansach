@@ -16,7 +16,8 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            app:contentInsetStart="0dp">
+            app:contentInsetStart="0dp"
+            app:layout_scrollFlags="scroll|enterAlways">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -51,6 +52,7 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fillViewport="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -81,7 +83,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="24dp"
-                android:text="Danh mục"
+                android:text="@string/categories_label"
                 android:textColor="@color/text_main"
                 android:textSize="18sp"
                 android:textStyle="bold" />
@@ -94,6 +96,7 @@
                 android:clipToPadding="false"
                 android:paddingHorizontal="12dp" />
 
+            <!-- Sách nổi bật -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -101,16 +104,14 @@
                 android:layout_marginTop="32dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
-
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Sách nổi bật"
+                    android:text="@string/featured_books_label"
                     android:textColor="@color/text_main"
                     android:textSize="18sp"
                     android:textStyle="bold" />
-
                 <TextView
                     android:id="@+id/tvSeeAllFeatured"
                     android:layout_width="wrap_content"
@@ -121,7 +122,6 @@
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </LinearLayout>
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvFeaturedBooks"
                 android:layout_width="match_parent"
@@ -130,16 +130,84 @@
                 android:clipToPadding="false"
                 android:paddingHorizontal="12dp" />
 
+            <!-- Sách bán chạy -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="32dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/best_selling_label"
+                    android:textColor="@color/text_main"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/tvSeeAllBestSelling"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="Xem tất cả"
+                    android:textColor="@color/sage_primary_dark"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvBestSellingBooks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:clipToPadding="false"
+                android:paddingHorizontal="12dp" />
+
+            <!-- Sách được yêu thích -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="32dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/most_liked_label"
+                    android:textColor="@color/text_main"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/tvSeeAllMostLiked"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:text="Xem tất cả"
+                    android:textColor="@color/sage_primary_dark"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvMostLikedBooks"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:clipToPadding="false"
+                android:paddingHorizontal="12dp" />
+
+            <!-- Sách mới nhất - Dạng Grid -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="32dp"
-                android:text="Sách mới nhất"
+                android:text="@string/newest_books_label"
                 android:textColor="@color/text_main"
                 android:textSize="18sp"
                 android:textStyle="bold" />
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvNewestBooks"
                 android:layout_width="match_parent"

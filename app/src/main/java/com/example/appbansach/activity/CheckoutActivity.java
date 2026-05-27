@@ -1,5 +1,6 @@
 package com.example.appbansach.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -15,7 +16,6 @@ import com.example.appbansach.model.Voucher;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
 
@@ -44,16 +44,29 @@ public class CheckoutActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-        // Lấy dữ liệu giỏ hàng từ Room
         CartManager.getInstance(this).getCartItems().observe(this, items -> {
             if (items != null) {
-                this.checkoutItems = items;
+                // Chỉ lấy những mục đã được chọn để thanh toán
+                this.checkoutItems.clear();
+                for (CartItemEntity item : items) {
+                    if (item.isSelected()) {
+                        this.checkoutItems.add(item);
+                    }
+                }
+                
+                if (checkoutItems.isEmpty()) {
+                    Toast.makeText(this, "Không có sản phẩm nào được chọn", Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
+                
                 calculateTotal();
             }
         });
 
         binding.btnApplyVoucher.setOnClickListener(v -> applyVoucher());
         binding.btnPlaceOrder.setOnClickListener(v -> placeOrder());
+        binding.ivBack.setOnClickListener(v -> finish());
     }
 
     private void calculateTotal() {
@@ -84,11 +97,11 @@ public class CheckoutActivity extends AppCompatActivity {
                         Toast.makeText(this, "Đã áp dụng mã giảm giá!", Toast.LENGTH_SHORT).show();
                     } else {
                         DecimalFormat formatter = new DecimalFormat("#,###");
-                        Toast.makeText(this, "Đơn hàng tối thiểu " + formatter.format(voucher.getMinOrderAmount()) + "đ để dùng mã này", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, "Đơn hàng tối thiểu " + formatter.format(voucher.getMinOrderAmount()) + "đ", Toast.LENGTH_LONG).show();
                     }
                 }
             } else {
-                Toast.makeText(this, "Mã giảm giá không tồn tại", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Mã không hợp lệ", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(e -> {
             binding.progressBar.setVisibility(View.GONE);
@@ -100,7 +113,6 @@ public class CheckoutActivity extends AppCompatActivity {
         DecimalFormat formatter = new DecimalFormat("#,###");
         binding.tvSubtotal.setText(formatter.format(subtotal) + "đ");
         binding.tvDiscount.setText("-" + formatter.format(discount) + "đ");
-        
         long grandTotal = subtotal + shippingFee - discount;
         binding.tvCheckoutTotal.setText(formatter.format(grandTotal) + "đ");
     }
@@ -111,31 +123,27 @@ public class CheckoutActivity extends AppCompatActivity {
         String address = binding.etCheckoutAddress.getText().toString().trim();
 
         if (name.isEmpty() || phone.isEmpty() || address.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập thông tin giao hàng", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (checkoutItems.isEmpty()) {
-            Toast.makeText(this, "Giỏ hàng đang trống", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
             return;
         }
 
         binding.progressBar.setVisibility(View.VISIBLE);
         binding.btnPlaceOrder.setEnabled(false);
 
-        String paymentMethod = binding.rbCOD.isChecked() ? "COD" : "Bank Transfer";
-
         WriteBatch batch = db.batch();
         DocumentReference orderRef = db.collection("orders").document();
+        String orderId = orderRef.getId();
+        long finalTotal = subtotal + shippingFee - discount;
+        boolean isTransfer = binding.rbTransfer.isChecked();
 
         Order order = new Order();
-        order.setOrderId(orderRef.getId());
+        order.setOrderId(orderId);
         order.setUserId(mAuth.getUid());
         order.setStatus("pending");
         order.setCreatedAt(Timestamp.now());
         order.setShippingFee(shippingFee);
-        order.setTotalAmount(subtotal - discount);
-        order.setPaymentMethod(paymentMethod);
+        order.setTotalAmount(finalTotal);
+        order.setPaymentMethod(isTransfer ? "Transfer" : "COD");
 
         List<Map<String, Object>> items = new ArrayList<>();
         for (CartItemEntity item : checkoutItems) {
@@ -146,10 +154,6 @@ public class CheckoutActivity extends AppCompatActivity {
             itemMap.put("quantity", item.getQuantity());
             itemMap.put("imageUrl", item.getImageUrl());
             items.add(itemMap);
-
-            // Cập nhật tồn kho
-            DocumentReference bookRef = db.collection("books").document(item.getBookId());
-            batch.update(bookRef, "stock", FieldValue.increment(-item.getQuantity()));
         }
         order.setItems(items);
 
@@ -160,11 +164,19 @@ public class CheckoutActivity extends AppCompatActivity {
         order.setShippingAddress(addressMap);
 
         batch.set(orderRef, order);
-
         batch.commit().addOnSuccessListener(aVoid -> {
-            Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
-            CartManager.getInstance(this).clearCart();
-            finish();
+            CartManager.getInstance(this).deleteSelectedItems();
+            
+            if (isTransfer) {
+                Intent intent = new Intent(this, PaymentQRActivity.class);
+                intent.putExtra("amount", finalTotal);
+                intent.putExtra("orderId", orderId);
+                startActivity(intent);
+                finish();
+            } else {
+                Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
+                finish();
+            }
         }).addOnFailureListener(e -> {
             binding.progressBar.setVisibility(View.GONE);
             binding.btnPlaceOrder.setEnabled(true);

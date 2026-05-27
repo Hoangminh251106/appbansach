@@ -11,91 +11,107 @@
         android:background="@color/app_background"
         app:elevation="0dp">
 
-        <LinearLayout
+        <com.google.android.material.appbar.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="8dp">
+            app:layout_scrollFlags="scroll|enterAlways|snap"
+            app:contentScrim="@color/app_background"
+            app:statusBarScrim="@color/app_background">
 
-            <ImageView
-                android:id="@+id/ivBack"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:padding="8dp"
-                android:src="@android:drawable/ic_menu_revert"
-                app:tint="@color/text_main" />
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginEnd="8dp"
-                android:hint="Tìm tên sách, tác giả..."
-                app:endIconMode="clear_text"
-                app:startIconDrawable="@android:drawable/ic_menu_search"
-                app:startIconTint="@color/sage_primary_dark"
-                app:boxStrokeColor="@color/sage_primary"
-                app:hintTextColor="@color/sage_primary_dark">
+                android:orientation="vertical"
+                android:background="@color/app_background">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etSearch"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/text_main"
-                    android:inputType="text" />
-            </com.google.android.material.textfield.TextInputLayout>
-        </LinearLayout>
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="8dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingHorizontal="16dp"
-            android:paddingBottom="8dp">
+                    <ImageView
+                        android:id="@+id/ivBack"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:padding="8dp"
+                        android:src="@android:drawable/ic_menu_revert"
+                        app:tint="@color/text_main" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/categories_label"
-                android:textStyle="bold"
-                android:textSize="14sp"
-                android:textColor="@color/text_main"
-                android:layout_marginBottom="4dp"/>
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:hint="Tìm tên sách, tác giả..."
+                        app:endIconMode="clear_text"
+                        app:startIconDrawable="@android:drawable/ic_menu_search"
+                        app:startIconTint="@color/sage_primary_dark"
+                        app:boxStrokeColor="@color/sage_primary"
+                        app:hintTextColor="@color/sage_primary_dark"
+                        app:boxBackgroundColor="@color/white">
 
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scrollbars="none">
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/chipGroupCategories"
-                    android:layout_width="wrap_content"
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etSearch"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_main"
+                            android:inputType="text" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:singleSelection="true" />
-            </HorizontalScrollView>
+                    android:orientation="vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingBottom="8dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/price_range_label"
-                android:textStyle="bold"
-                android:textSize="14sp"
-                android:textColor="@color/text_main"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="4dp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Danh mục"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_main"
+                        android:layout_marginBottom="4dp"/>
 
-            <com.google.android.material.slider.RangeSlider
-                android:id="@+id/priceRangeSlider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:valueFrom="0"
-                android:valueTo="1000000"
-                app:thumbColor="@color/sage_primary"
-                app:trackColorActive="@color/sage_primary"
-                app:trackColorInactive="@color/sage_accent"
-                app:values="@array/initial_range_values" />
-        </LinearLayout>
+                    <HorizontalScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollbars="none">
+                        <com.google.android.material.chip.ChipGroup
+                            android:id="@+id/chipGroupCategories"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:singleSelection="true" />
+                    </HorizontalScrollView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Khoảng giá"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_main"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="4dp"/>
+
+                    <com.google.android.material.slider.RangeSlider
+                        android:id="@+id/priceRangeSlider"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:valueFrom="0"
+                        android:valueTo="1000000"
+                        app:thumbColor="@color/sage_primary"
+                        app:trackColorActive="@color/sage_primary"
+                        app:trackColorInactive="@color/sage_accent"
+                        app:values="@array/initial_range_values" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -104,6 +120,7 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:padding="8dp"
+        android:background="@color/app_background"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <LinearLayout

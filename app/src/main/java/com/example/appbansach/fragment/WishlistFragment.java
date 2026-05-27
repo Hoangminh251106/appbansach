@@ -17,6 +17,7 @@ import com.example.appbansach.databinding.FragmentWishlistBinding;
 import com.example.appbansach.model.Book;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class WishlistFragment extends Fragment {
     private List<Book> wishlistBooks = new ArrayList<>();
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
+    private ListenerRegistration wishlistListener;
 
     @Nullable
     @Override
@@ -37,7 +39,7 @@ public class WishlistFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
 
         setupRecyclerView();
-        loadWishlist();
+        startListeningWishlist();
 
         binding.toolbar.setNavigationOnClickListener(v -> Navigation.findNavController(v).navigateUp());
 
@@ -54,18 +56,23 @@ public class WishlistFragment extends Fragment {
         binding.rvWishlist.setAdapter(adapter);
     }
 
-    private void loadWishlist() {
+    private void startListeningWishlist() {
         String userId = mAuth.getUid();
         if (userId == null) return;
 
-        db.collection("users").document(userId).get().addOnSuccessListener(documentSnapshot -> {
-            if (isAdded() && documentSnapshot.exists()) {
-                List<String> wishlistIds = (List<String>) documentSnapshot.get("wishlist");
-                if (wishlistIds == null || wishlistIds.isEmpty()) {
+        // Sử dụng addSnapshotListener để cập nhật ngay lập tức khi nhấn yêu thích ở nơi khác
+        wishlistListener = db.collection("users").document(userId).addSnapshotListener((documentSnapshot, e) -> {
+            if (e != null || documentSnapshot == null || !documentSnapshot.exists()) return;
+
+            List<String> wishlistIds = (List<String>) documentSnapshot.get("wishlist");
+            if (wishlistIds == null || wishlistIds.isEmpty()) {
+                if (isAdded()) {
                     binding.layoutEmptyWishlist.setVisibility(View.VISIBLE);
                     wishlistBooks.clear();
                     adapter.notifyDataSetChanged();
-                } else {
+                }
+            } else {
+                if (isAdded()) {
                     binding.layoutEmptyWishlist.setVisibility(View.GONE);
                     fetchBooks(wishlistIds);
                 }
@@ -74,8 +81,7 @@ public class WishlistFragment extends Fragment {
     }
 
     private void fetchBooks(List<String> ids) {
-        // Firestore 'in' query supports up to 10 elements. 
-        // For a full app, we might need to chunk this or fetch individually.
+        // Lấy toàn bộ sách và lọc để đảm bảo dữ liệu mới nhất
         db.collection("books").get().addOnSuccessListener(queryDocumentSnapshots -> {
             if (!isAdded()) return;
             wishlistBooks.clear();
@@ -94,6 +100,7 @@ public class WishlistFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (wishlistListener != null) wishlistListener.remove();
         binding = null;
     }
 }

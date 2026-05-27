@@ -5,11 +5,48 @@
     android:layout_height="match_parent"
     android:background="@color/app_background">
 
+    <LinearLayout
+        android:id="@+id/layoutHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/card_surface"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp">
+
+        <CheckBox
+            android:id="@+id/cbSelectAll"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:buttonTint="@color/sage_primary_dark"
+            android:checked="true"
+            android:text="Tất cả"
+            android:textColor="@color/text_main"
+            android:textSize="14sp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/btnDeleteSelected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Xóa đã chọn"
+            android:textColor="#E63946"
+            android:textSize="14sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvCart"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/layoutCheckout"
+        android:layout_below="@id/layoutHeader"
         android:clipToPadding="false"
         android:paddingTop="8dp"
         android:paddingBottom="8dp" />

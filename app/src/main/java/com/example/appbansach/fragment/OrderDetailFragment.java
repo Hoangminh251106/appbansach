@@ -4,9 +4,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,16 +42,22 @@ public class OrderDetailFragment extends Fragment {
 
         binding.toolbar.setNavigationOnClickListener(v -> Navigation.findNavController(v).navigateUp());
 
+        binding.btnCancelOrder.setOnClickListener(v -> showCancelConfirmation());
+
         return binding.getRoot();
     }
 
     private void loadOrderDetail() {
+        if (binding == null) return;
         binding.progressBar.setVisibility(View.VISIBLE);
-        db.collection("orders").document(orderId).get().addOnSuccessListener(documentSnapshot -> {
-            if (isAdded() && documentSnapshot.exists()) {
-                binding.progressBar.setVisibility(View.GONE);
+        db.collection("orders").document(orderId).addSnapshotListener((documentSnapshot, e) -> {
+            if (!isAdded() || binding == null) return;
+            binding.progressBar.setVisibility(View.GONE);
+            
+            if (documentSnapshot != null && documentSnapshot.exists()) {
                 Order order = documentSnapshot.toObject(Order.class);
                 if (order != null) {
+                    order.setOrderId(documentSnapshot.getId());
                     displayOrderDetail(order);
                 }
             }
@@ -59,6 +67,15 @@ public class OrderDetailFragment extends Fragment {
     private void displayOrderDetail(Order order) {
         binding.chipDetailStatus.setText(getStatusText(order.getStatus()));
         
+        // Cập nhật hiển thị nút Hủy đơn
+        if ("pending".equals(order.getStatus())) {
+            binding.btnCancelOrder.setVisibility(View.VISIBLE);
+            binding.tvCancelNote.setVisibility(View.VISIBLE);
+        } else {
+            binding.btnCancelOrder.setVisibility(View.GONE);
+            binding.tvCancelNote.setVisibility(View.GONE);
+        }
+
         Map<String, String> addr = order.getShippingAddress();
         if (addr != null) {
             binding.tvDetailName.setText(addr.get("name"));
@@ -71,10 +88,36 @@ public class OrderDetailFragment extends Fragment {
         binding.tvShipping.setText(formatter.format(order.getShippingFee()) + "đ");
         binding.tvGrandTotal.setText(formatter.format(order.getTotalAmount() + order.getShippingFee()) + "đ");
 
-        // Hiển thị danh sách sản phẩm bằng OrderItemAdapter
         OrderItemAdapter adapter = new OrderItemAdapter(order.getItems());
         binding.rvOrderItems.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvOrderItems.setAdapter(adapter);
+    }
+
+    private void showCancelConfirmation() {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Hủy đơn hàng")
+                .setMessage("Bạn có chắc chắn muốn hủy đơn hàng này không?")
+                .setPositiveButton("Hủy đơn", (dialog, which) -> cancelOrder())
+                .setNegativeButton("Đóng", null)
+                .show();
+    }
+
+    private void cancelOrder() {
+        binding.progressBar.setVisibility(View.VISIBLE);
+        db.collection("orders").document(orderId)
+                .update("status", "cancelled")
+                .addOnSuccessListener(aVoid -> {
+                    if (isAdded()) {
+                        binding.progressBar.setVisibility(View.GONE);
+                        Toast.makeText(getContext(), "Đã hủy đơn hàng thành công", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    if (isAdded()) {
+                        binding.progressBar.setVisibility(View.GONE);
+                        Toast.makeText(getContext(), "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private String getStatusText(String status) {

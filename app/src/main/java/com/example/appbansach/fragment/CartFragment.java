@@ -34,16 +34,41 @@ public class CartFragment extends Fragment {
         
         setupCartList();
         observeCart();
+        setupListeners();
+
+        return binding.getRoot();
+    }
+
+    private void setupListeners() {
+        binding.cbSelectAll.setOnClickListener(v -> {
+            boolean isChecked = binding.cbSelectAll.isChecked();
+            CartManager.getInstance(requireContext()).updateAllSelection(isChecked);
+        });
+
+        binding.btnDeleteSelected.setOnClickListener(v -> {
+            for (CartItemEntity item : currentItems) {
+                if (item.isSelected()) {
+                    CartManager.getInstance(requireContext()).removeFromCart(item.getBookId());
+                }
+            }
+            Toast.makeText(getContext(), "Đã xóa các mục đã chọn", Toast.LENGTH_SHORT).show();
+        });
 
         binding.btnProceedCheckout.setOnClickListener(v -> {
-            if (currentItems == null || currentItems.isEmpty()) {
-                Toast.makeText(getContext(), "Giỏ hàng trống", Toast.LENGTH_SHORT).show();
+            boolean hasSelected = false;
+            for (CartItemEntity item : currentItems) {
+                if (item.isSelected()) {
+                    hasSelected = true;
+                    break;
+                }
+            }
+
+            if (!hasSelected) {
+                Toast.makeText(getContext(), "Vui lòng chọn ít nhất một sản phẩm để thanh toán", Toast.LENGTH_SHORT).show();
             } else {
                 startActivity(new Intent(getActivity(), CheckoutActivity.class));
             }
         });
-
-        return binding.getRoot();
     }
 
     private void setupCartList() {
@@ -57,6 +82,12 @@ public class CartFragment extends Fragment {
             public void onRemoveItem(CartItemEntity item) {
                 CartManager.getInstance(requireContext()).removeFromCart(item.getBookId());
             }
+
+            @Override
+            public void onSelectionChange(CartItemEntity item, boolean isSelected) {
+                CartManager.getInstance(requireContext()).updateSelection(item.getBookId(), isSelected);
+                updateSelectAllCheckbox();
+            }
         });
         binding.rvCart.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.rvCart.setAdapter(adapter);
@@ -68,21 +99,46 @@ public class CartFragment extends Fragment {
                 currentItems = items;
                 adapter.setData(items);
                 updateUI(items);
+                updateSelectAllCheckbox();
             }
         });
+    }
+
+    private void updateSelectAllCheckbox() {
+        if (currentItems == null || currentItems.isEmpty()) {
+            binding.cbSelectAll.setChecked(false);
+            binding.btnDeleteSelected.setVisibility(View.GONE);
+            return;
+        }
+
+        boolean allSelected = true;
+        boolean anySelected = false;
+        for (CartItemEntity item : currentItems) {
+            if (!item.isSelected()) {
+                allSelected = false;
+            } else {
+                anySelected = true;
+            }
+        }
+        binding.cbSelectAll.setChecked(allSelected);
+        binding.btnDeleteSelected.setVisibility(anySelected ? View.VISIBLE : View.GONE);
     }
 
     private void updateUI(List<CartItemEntity> items) {
         if (items == null || items.isEmpty()) {
             binding.layoutEmpty.setVisibility(View.VISIBLE);
             binding.layoutCheckout.setVisibility(View.GONE);
+            binding.layoutHeader.setVisibility(View.GONE);
         } else {
             binding.layoutEmpty.setVisibility(View.GONE);
             binding.layoutCheckout.setVisibility(View.VISIBLE);
+            binding.layoutHeader.setVisibility(View.VISIBLE);
             
             long total = 0;
             for (CartItemEntity item : items) {
-                total += item.getPrice() * item.getQuantity();
+                if (item.isSelected()) {
+                    total += item.getPrice() * item.getQuantity();
+                }
             }
             DecimalFormat formatter = new DecimalFormat("#,###");
             binding.tvTotalCart.setText(formatter.format(total) + "đ");
