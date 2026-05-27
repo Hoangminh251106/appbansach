@@ -21,7 +21,7 @@ import com.example.appbansach.databinding.DialogWriteReviewBinding;
 import com.example.appbansach.databinding.FragmentBookDetailBinding;
 import com.example.appbansach.helper.CartManager;
 import com.example.appbansach.model.Book;
-import com.example.appbansach.model.Review;
+import com.example.appbansach.model.ReviewModel;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -42,7 +42,7 @@ public class BookDetailFragment extends Fragment {
     private Book book;
     private boolean isFavorite = false;
     private ReviewAdapter reviewAdapter;
-    private List<Review> reviewList = new ArrayList<>();
+    private List<ReviewModel> reviewList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -132,7 +132,7 @@ public class BookDetailFragment extends Fragment {
         String userName = mAuth.getCurrentUser().getDisplayName();
         if (userName == null || userName.isEmpty()) userName = "Người dùng ẩn danh";
 
-        Review review = new Review(userName, rating, comment, Timestamp.now());
+        ReviewModel review = new ReviewModel(userName, rating, comment, Timestamp.now());
 
         db.collection("books").document(bookId).collection("reviews").add(review)
                 .addOnSuccessListener(documentReference -> {
@@ -233,7 +233,7 @@ public class BookDetailFragment extends Fragment {
                     if (isAdded()) {
                         reviewList.clear();
                         for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                            Review review = doc.toObject(Review.class);
+                            ReviewModel review = doc.toObject(ReviewModel.class);
                             reviewList.add(review);
                         }
                         reviewAdapter.notifyDataSetChanged();

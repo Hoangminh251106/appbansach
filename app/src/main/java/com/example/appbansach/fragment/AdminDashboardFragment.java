@@ -1,5 +1,6 @@
 package com.example.appbansach.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.example.appbansach.R;
+import com.example.appbansach.admin.ManageShippingActivity;
 import com.example.appbansach.databinding.FragmentAdminDashboardBinding;
 
 public class AdminDashboardFragment extends Fragment {
@@ -29,6 +31,11 @@ public class AdminDashboardFragment extends Fragment {
 
         binding.btnManageOrders.setOnClickListener(v -> 
             Navigation.findNavController(v).navigate(R.id.action_adminDashboardFragment_to_manageOrdersFragment));
+
+        binding.btnManageShipping.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), ManageShippingActivity.class);
+            startActivity(intent);
+        });
 
         binding.btnManageVouchers.setOnClickListener(v -> 
             Navigation.findNavController(v).navigate(R.id.action_adminDashboardFragment_to_manageVouchersFragment));

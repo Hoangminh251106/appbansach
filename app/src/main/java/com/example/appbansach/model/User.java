@@ -10,8 +10,9 @@ public class User {
     private String email;
     private String phone;
     private String address;
-    private String avatarUrl; // Thêm trường này
+    private String avatarUrl;
     private String role; // "customer" or "admin"
+    private String status; // "active" or "locked"
     private List<String> wishlist = new ArrayList<>();
     private Timestamp createdAt;
 
@@ -24,6 +25,7 @@ public class User {
         this.phone = phone;
         this.address = address;
         this.role = role;
+        this.status = "active";
         this.createdAt = createdAt;
         this.wishlist = new ArrayList<>();
     }
@@ -43,6 +45,8 @@ public class User {
     public void setAvatarUrl(String avatarUrl) { this.avatarUrl = avatarUrl; }
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
     public List<String> getWishlist() { return wishlist; }
     public void setWishlist(List<String> wishlist) { this.wishlist = wishlist; }
     public Timestamp getCreatedAt() { return createdAt; }

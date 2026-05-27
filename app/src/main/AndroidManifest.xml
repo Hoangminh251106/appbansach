@@ -33,6 +33,16 @@
         <activity android:name="com.example.appbansach.activity.RegisterActivity" />
         <activity android:name="com.example.appbansach.activity.CheckoutActivity" />
 
+        <!-- Admin Activities -->
+        <activity android:name="com.example.appbansach.admin.ManageUsersActivity" />
+        <activity android:name="com.example.appbansach.admin.UserDetailActivity" />
+        <activity android:name="com.example.appbansach.admin.ManageShippingActivity" />
+        <activity android:name="com.example.appbansach.admin.ShippingDetailActivity" />
+        <activity android:name="com.example.appbansach.admin.ManageReviewsActivity" />
+        <activity android:name="com.example.appbansach.admin.ManageNotificationsActivity" />
+        <activity android:name="com.example.appbansach.admin.ManagePaymentsActivity" />
+        <activity android:name="com.example.appbansach.admin.ManageSettingsActivity" />
+
     </application>
 
 </manifest>
