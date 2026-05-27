@@ -106,6 +106,33 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Quản lý Vận chuyển -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/btnManageShipping"
+            android:layout_width="0dp"
+            android:layout_height="120dp"
+            android:layout_columnWeight="1"
+            android:layout_margin="8dp"
+            app:cardCornerRadius="16dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@android:drawable/ic_dialog_map"
+                    app:tint="?attr/colorPrimary" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Vận chuyển"
+                    android:layout_marginTop="8dp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <!-- Quản lý Voucher -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/btnManageVouchers"
@@ -173,5 +200,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Quay lại giao diện khách hàng" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAdminLogout"
+        style="@style/Widget.Material3.Button.TonalButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Đăng xuất"
+        android:textColor="#D60000"
+        app:icon="@android:drawable/ic_lock_power_off"
+        app:iconTint="#D60000"
+        android:layout_marginTop="8dp"/>
 
 </LinearLayout>

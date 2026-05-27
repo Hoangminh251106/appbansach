@@ -149,6 +149,11 @@
         <action
             android:id="@+id/action_profileFragment_to_statisticsFragment"
             app:destination="@id/statisticsFragment" />
+        <action
+            android:id="@+id/action_profileFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -213,6 +218,11 @@
         <action
             android:id="@+id/action_adminDashboardFragment_to_manageVouchersFragment"
             app:destination="@id/manageVouchersFragment" />
+        <action
+            android:id="@+id/action_adminDashboardFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment

@@ -1,122 +1,192 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="20dp"
-    android:background="@color/app_background">
+    android:background="@color/app_background"
+    android:fillViewport="true">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:navigationIcon="@android:drawable/ic_menu_revert"
-        app:navigationIconTint="@color/text_main"
-        app:title="Chỉnh sửa thông tin"
-        app:titleTextColor="@color/text_main"
-        android:layout_marginBottom="20dp"/>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardAvatar"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_gravity="center"
-        android:layout_marginBottom="24dp"
-        app:cardCornerRadius="60dp"
-        app:cardBackgroundColor="@color/card_surface"
-        app:strokeWidth="2dp"
-        app:strokeColor="@color/sage_primary">
-
-        <ImageView
-            android:id="@+id/ivEditAvatar"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@android:drawable/ic_menu_myplaces"
-            android:padding="20dp"
-            app:tint="@color/sage_primary" />
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Họ và tên"
-        android:layout_marginBottom="16dp"
-        app:boxStrokeColor="@color/sage_primary"
-        app:hintTextColor="@color/sage_primary_dark"
-        app:startIconTint="@color/sage_primary_dark"
-        app:boxCornerRadiusBottomEnd="12dp"
-        app:boxCornerRadiusBottomStart="12dp"
-        app:boxCornerRadiusTopEnd="12dp"
-        app:boxCornerRadiusTopStart="12dp">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etFullName"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:navigationIcon="@android:drawable/ic_menu_revert"
+            app:navigationIconTint="@color/text_main"
+            app:title="Thiết lập tài khoản Admin"
+            app:titleTextColor="@color/text_main" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardAvatar"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="60dp"
+            app:cardBackgroundColor="@color/card_surface"
+            app:strokeWidth="2dp"
+            app:strokeColor="@color/sage_primary"
+            app:cardElevation="4dp">
+
+            <ImageView
+                android:id="@+id/ivEditAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@android:drawable/ic_menu_myplaces" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thông tin cá nhân"
+            android:textStyle="bold"
+            android:textColor="@color/sage_primary_dark"
+            android:layout_marginBottom="16dp"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/text_main"
-            android:inputType="textPersonName" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:hint="Email (Không thể sửa)"
+            android:layout_marginBottom="12dp"
+            app:startIconDrawable="@android:drawable/ic_dialog_email"
+            app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:enabled="false"
+                android:textColor="@color/text_secondary" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Số điện thoại"
-        android:layout_marginBottom="16dp"
-        app:boxStrokeColor="@color/sage_primary"
-        app:hintTextColor="@color/sage_primary_dark"
-        app:startIconTint="@color/sage_primary_dark"
-        app:boxCornerRadiusBottomEnd="12dp"
-        app:boxCornerRadiusBottomStart="12dp"
-        app:boxCornerRadiusTopEnd="12dp"
-        app:boxCornerRadiusTopStart="12dp">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etPhone"
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/text_main"
-            android:inputType="phone" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:hint="Họ và tên"
+            android:layout_marginBottom="12dp"
+            app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etFullName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.textfield.TextInputLayout
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Địa chỉ"
-        android:layout_marginBottom="32dp"
-        app:boxStrokeColor="@color/sage_primary"
-        app:hintTextColor="@color/sage_primary_dark"
-        app:startIconTint="@color/sage_primary_dark"
-        app:boxCornerRadiusBottomEnd="12dp"
-        app:boxCornerRadiusBottomStart="12dp"
-        app:boxCornerRadiusTopEnd="12dp"
-        app:boxCornerRadiusTopStart="12dp">
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etAddress"
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/text_main"
-            android:inputType="textPostalAddress" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:hint="Số điện thoại"
+            android:layout_marginBottom="12dp"
+            app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="phone" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnSave"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:text="Lưu thay đổi"
-        android:textColor="@color/white"
-        app:backgroundTint="@color/sage_primary"
-        app:cornerRadius="12dp" />
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Địa chỉ"
+            android:layout_marginBottom="24dp"
+            app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPostalAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:indeterminateTint="@color/sage_primary"
-        android:visibility="gone" />
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" android:layout_marginBottom="24dp"/>
 
-</LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đổi mật khẩu"
+            android:textStyle="bold"
+            android:textColor="@color/sage_primary_dark"
+            android:layout_marginBottom="16dp"/>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mật khẩu cũ"
+            android:layout_marginBottom="12dp"
+            app:passwordToggleEnabled="true"
+            app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etOldPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mật khẩu mới"
+            android:layout_marginBottom="12dp"
+            app:passwordToggleEnabled="true"
+            app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etNewPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Xác nhận mật khẩu mới"
+            android:layout_marginBottom="24dp"
+            app:passwordToggleEnabled="true"
+            app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="LƯU THAY ĐỔI"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            app:backgroundTint="@color/sage_primary"
+            app:cornerRadius="12dp" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+</ScrollView>

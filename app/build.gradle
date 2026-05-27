@@ -54,6 +54,9 @@ dependencies {
     implementation libs.retrofit
     implementation libs.converter.gson
     implementation libs.okhttp.logging
+    
+    // Circle Image View
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
 
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit

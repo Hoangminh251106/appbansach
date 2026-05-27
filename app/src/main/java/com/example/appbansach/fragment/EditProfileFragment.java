@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
+import com.example.appbansach.R;
 import com.example.appbansach.databinding.FragmentEditProfileBinding;
 import com.example.appbansach.model.User;
 import com.google.firebase.auth.FirebaseAuth;
@@ -40,7 +41,7 @@ public class EditProfileFragment extends Fragment {
                 if (uri != null) {
                     imageUri = uri;
                     binding.ivEditAvatar.setImageURI(uri);
-                    binding.ivEditAvatar.setPadding(0,0,0,0);
+                    binding.ivEditAvatar.setPadding(0, 0, 0, 0);
                 }
             }
     );
@@ -52,16 +53,14 @@ public class EditProfileFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
-        
+
         if (mAuth.getCurrentUser() != null) {
             userId = mAuth.getCurrentUser().getUid();
             loadUserData();
         }
 
         binding.toolbar.setNavigationOnClickListener(v -> Navigation.findNavController(v).navigateUp());
-
         binding.cardAvatar.setOnClickListener(v -> getContent.launch("image/*"));
-        
         binding.btnSave.setOnClickListener(v -> saveChanges());
 
         return binding.getRoot();
@@ -75,13 +74,14 @@ public class EditProfileFragment extends Fragment {
                 if (documentSnapshot.exists()) {
                     currentUser = documentSnapshot.toObject(User.class);
                     if (currentUser != null) {
+                        binding.etEmail.setText(currentUser.getEmail());
                         binding.etFullName.setText(currentUser.getFullName());
                         binding.etPhone.setText(currentUser.getPhone());
                         binding.etAddress.setText(currentUser.getAddress());
-                        
+
                         if (currentUser.getAvatarUrl() != null && !currentUser.getAvatarUrl().isEmpty()) {
                             Glide.with(this).load(currentUser.getAvatarUrl()).into(binding.ivEditAvatar);
-                            binding.ivEditAvatar.setPadding(0,0,0,0);
+                            binding.ivEditAvatar.setPadding(0, 0, 0, 0);
                         }
                     }
                 }
