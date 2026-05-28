@@ -1,5 +1,6 @@
 package com.example.appbansach.fragment;
 
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -91,7 +92,7 @@ public class BookDetailFragment extends Fragment {
             }
         });
 
-        binding.fabWishlist.setOnClickListener(v -> toggleWishlist());
+        binding.ivBack.setOnClickListener(v -> toggleWishlist());
 
         binding.tvWriteReview.setOnClickListener(v -> showWriteReviewDialog());
     }
@@ -222,7 +223,7 @@ public class BookDetailFragment extends Fragment {
     }
 
     private void updateWishlistFabIcon() {
-        binding.fabWishlist.setImageResource(isFavorite ? android.R.drawable.btn_star_big_on : android.R.drawable.btn_star_big_off);
+        binding.ivBack.setImageResource(isFavorite ? android.R.drawable.btn_star_big_on : android.R.drawable.btn_star_big_off);
     }
 
     private void loadReviews() {
@@ -244,21 +245,21 @@ public class BookDetailFragment extends Fragment {
 
     private void displayBookDetails() {
         binding.collapsingToolbar.setTitle(book.getTitle());
-        binding.tvDetailTitle.setText(book.getTitle());
-        binding.tvDetailAuthor.setText("Tác giả: " + book.getAuthor());
+        binding.tvDetailReviewCount.setText(book.getTitle());
+        binding.tvAuthor.setText("Tác giả: " + book.getAuthor());
 
         DecimalFormat formatter = new DecimalFormat("#,###");
-        binding.tvDetailPrice.setText(formatter.format(book.getPrice()) + "đ");
+        binding.tvDetailOriginalPrice.setText(formatter.format(book.getPrice()) + "đ");
         
         if (book.getOriginalPrice() > 0) {
             binding.tvDetailOriginalPrice.setText(formatter.format(book.getOriginalPrice()) + "đ");
-            binding.tvDetailOriginalPrice.setPaintFlags(binding.tvDetailOriginalPrice.getPaintFlags() | android.graphics.Paint.STRIKE_THRU_TEXT_FLAG);
+            binding.tvDetailOriginalPrice.setPaintFlags(binding.tvDetailOriginalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             binding.tvDetailOriginalPrice.setVisibility(View.VISIBLE);
         } else {
             binding.tvDetailOriginalPrice.setVisibility(View.GONE);
         }
 
-        binding.tvDetailDescription.setText(book.getDescription());
+        binding.tvDescription.setText(book.getDescription());
         binding.detailRatingBar.setRating((float) book.getRating());
         binding.tvDetailReviewCount.setText("(" + book.getReviewCount() + " đánh giá)");
         
@@ -273,7 +274,7 @@ public class BookDetailFragment extends Fragment {
         Glide.with(this)
                 .load(book.getImageUrl())
                 .placeholder(android.R.drawable.ic_menu_gallery)
-                .into(binding.ivBookLarge);
+                .into(binding.ivBookCover);
     }
 
     @Override
