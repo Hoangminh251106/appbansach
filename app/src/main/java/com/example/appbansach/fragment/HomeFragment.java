@@ -1,12 +1,17 @@
 package com.example.appbansach.fragment;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -32,9 +37,9 @@ import com.example.appbansach.model.Category;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,7 +56,6 @@ public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
-    private FirebaseStorage storage;
     
     private BookAdapter newestAdapter, featuredAdapter, bestSellingAdapter, mostLikedAdapter;
     private CategoryAdapter categoryAdapter;
@@ -68,7 +72,7 @@ public class HomeFragment extends Fragment {
 
     private final ActivityResultLauncher<String> getAvatarLauncher = registerForActivityResult(
             new ActivityResultContracts.GetContent(),
-            uri -> { if (uri != null) uploadAvatar(uri); }
+            uri -> { if (uri != null) uploadAvatarAsBase64(uri); }
     );
 
     @Nullable
@@ -77,7 +81,6 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
-        storage = FirebaseStorage.getInstance();
         initRetrofit();
         return binding.getRoot();
     }
@@ -98,6 +101,92 @@ public class HomeFragment extends Fragment {
                 fetchBooksForHome();
             }
         }, 500);
+    }
+
+    private void setupListeners() {
+        binding.tvSeeAllFeatured.setOnClickListener(v -> navigateToSearch("văn học Việt Nam"));
+        binding.tvSeeAllBestSelling.setOnClickListener(v -> navigateToSearch("kinh tế"));
+        binding.tvSeeAllMostLiked.setOnClickListener(v -> navigateToSearch("kỹ năng sống"));
+        
+        binding.ivUserAvatar.setOnLongClickListener(v -> {
+            getAvatarLauncher.launch("image/*");
+            return true;
+        });
+        
+        binding.ivUserAvatar.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.profileFragment));
+    }
+
+    private void uploadAvatarAsBase64(Uri uri) {
+        String uid = mAuth.getUid();
+        if (uid == null) return;
+
+        binding.progressBar.setVisibility(View.VISIBLE);
+        
+        new Thread(() -> {
+            try {
+                InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
+                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                
+                int maxSize = 400;
+                int width = bitmap.getWidth();
+                int height = bitmap.getHeight();
+                float ratio = (float) width / (float) height;
+                if (ratio > 1) {
+                    width = maxSize;
+                    height = (int) (width / ratio);
+                } else {
+                    height = maxSize;
+                    width = (int) (height * ratio);
+                }
+                Bitmap scaled = Bitmap.createScaledBitmap(bitmap, width, height, true);
+                
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                scaled.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+                String base64Image = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
+
+                db.collection("users").document(uid).update("avatarUrl", base64Image)
+                        .addOnSuccessListener(aVoid -> {
+                            if (isAdded()) {
+                                binding.progressBar.setVisibility(View.GONE);
+                                Toast.makeText(getContext(), "Cập nhật ảnh thành công!", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            } catch (Exception e) {
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        binding.progressBar.setVisibility(View.GONE);
+                        Toast.makeText(getContext(), "Lỗi xử lý ảnh", Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }
+        }).start();
+    }
+
+    private void loadUserAvatar() {
+        String uid = mAuth.getUid();
+        if (uid != null) {
+            db.collection("users").document(uid).addSnapshotListener((doc, e) -> {
+                if (doc != null && doc.exists() && isAdded() && binding != null) {
+                    String avatarData = doc.getString("avatarUrl");
+                    displayAvatar(avatarData, binding.ivUserAvatar);
+                }
+            });
+        }
+    }
+
+    private void displayAvatar(String data, ImageView imageView) {
+        if (data == null || data.isEmpty() || !isAdded()) return;
+        
+        if (data.length() > 200) { // Nếu là Base64
+            try {
+                byte[] decodedString = Base64.decode(data, Base64.DEFAULT);
+                Glide.with(this).asBitmap().load(decodedString).circleCrop().into(imageView);
+            } catch (Exception e) {
+                Log.e("AvatarError", "Error decoding base64");
+            }
+        } else { // Nếu là URL
+            Glide.with(this).load(data).circleCrop().placeholder(R.drawable.ic_profile).into(imageView);
+        }
     }
 
     private void initRetrofit() {
@@ -136,19 +225,6 @@ public class HomeFragment extends Fragment {
         binding.rvNewestBooks.setAdapter(newestAdapter);
     }
 
-    private void setupListeners() {
-        binding.tvSeeAllFeatured.setOnClickListener(v -> navigateToSearch("văn học Việt Nam"));
-        binding.tvSeeAllBestSelling.setOnClickListener(v -> navigateToSearch("kinh tế"));
-        binding.tvSeeAllMostLiked.setOnClickListener(v -> navigateToSearch("kỹ năng sống"));
-        
-        binding.ivUserAvatar.setOnLongClickListener(v -> {
-            getAvatarLauncher.launch("image/*");
-            return true;
-        });
-        
-        binding.ivUserAvatar.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.profileFragment));
-    }
-
     private void loadBanners() {
         db.collection("banners").get().addOnSuccessListener(queryDocumentSnapshots -> {
             if (isAdded()) {
@@ -159,53 +235,12 @@ public class HomeFragment extends Fragment {
                         bannerList.add(banner);
                     }
                 } else {
-                    // Nếu DB chưa có banner, dùng banner mặc định tránh để trống (màu xám như hình)
                     bannerList.add(new Banner("1", "https://img.freepik.com/free-vector/book-store-banner-template_23-2148685121.jpg"));
                     bannerList.add(new Banner("2", "https://img.freepik.com/free-vector/hand-drawn-book-club-banner_23-2149721453.jpg"));
                 }
                 bannerAdapter.notifyDataSetChanged();
             }
         });
-    }
-
-    private void uploadAvatar(Uri uri) {
-        String uid = mAuth.getUid();
-        if (uid == null) return;
-
-        binding.progressBar.setVisibility(View.VISIBLE);
-        StorageReference ref = storage.getReference().child("avatars/" + uid + ".jpg");
-        ref.putFile(uri).addOnSuccessListener(taskSnapshot -> ref.getDownloadUrl().addOnSuccessListener(downloadUri -> {
-            db.collection("users").document(uid).update("avatarUrl", downloadUri.toString())
-                    .addOnSuccessListener(aVoid -> {
-                        if (isAdded()) {
-                            binding.progressBar.setVisibility(View.GONE);
-                            Toast.makeText(getContext(), "Cập nhật ảnh đại diện thành công", Toast.LENGTH_SHORT).show();
-                            Glide.with(this).load(downloadUri).circleCrop().into(binding.ivUserAvatar);
-                        }
-                    });
-        })).addOnFailureListener(e -> {
-            if (isAdded()) {
-                binding.progressBar.setVisibility(View.GONE);
-                Toast.makeText(getContext(), "Lỗi tải ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void loadUserAvatar() {
-        String uid = mAuth.getUid();
-        if (uid != null) {
-            db.collection("users").document(uid).addSnapshotListener((doc, e) -> {
-                if (doc != null && doc.exists() && isAdded() && binding != null) {
-                    String url = doc.getString("avatarUrl");
-                    if (url != null && !url.isEmpty()) {
-                        Glide.with(this).load(url).circleCrop()
-                             .placeholder(R.drawable.ic_profile) // Hiện icon profile trong lúc load
-                             .error(R.drawable.ic_profile)       // Hiện icon profile nếu lỗi (Object not exist)
-                             .into(binding.ivUserAvatar);
-                    }
-                }
-            });
-        }
     }
 
     private void navigateToSearch(String query) {
