@@ -14,6 +14,7 @@ public class User {
     private String role; // "customer" or "admin"
     private String status; // "active" or "locked"
     private List<String> wishlist = new ArrayList<>();
+    private List<Object> currentCart = new ArrayList<>(); // Thêm trường này để khớp với dữ liệu Firestore
     private Timestamp createdAt;
 
     public User() {}
@@ -28,6 +29,7 @@ public class User {
         this.status = "active";
         this.createdAt = createdAt;
         this.wishlist = new ArrayList<>();
+        this.currentCart = new ArrayList<>();
     }
 
     // Getters and Setters
@@ -49,6 +51,8 @@ public class User {
     public void setStatus(String status) { this.status = status; }
     public List<String> getWishlist() { return wishlist; }
     public void setWishlist(List<String> wishlist) { this.wishlist = wishlist; }
+    public List<Object> getCurrentCart() { return currentCart; }
+    public void setCurrentCart(List<Object> currentCart) { this.currentCart = currentCart; }
     public Timestamp getCreatedAt() { return createdAt; }
     public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
 }

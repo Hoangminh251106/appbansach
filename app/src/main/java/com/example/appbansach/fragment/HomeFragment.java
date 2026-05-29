@@ -20,11 +20,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
 import com.example.appbansach.R;
+import com.example.appbansach.adapter.BannerAdapter;
 import com.example.appbansach.adapter.BookAdapter;
 import com.example.appbansach.adapter.CategoryAdapter;
 import com.example.appbansach.data.model.GoogleBooksResponse;
 import com.example.appbansach.data.repository.BookApiService;
 import com.example.appbansach.databinding.FragmentHomeBinding;
+import com.example.appbansach.model.Banner;
 import com.example.appbansach.model.Book;
 import com.example.appbansach.model.Category;
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,9 +36,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -52,24 +52,23 @@ public class HomeFragment extends Fragment {
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private FirebaseStorage storage;
+    
     private BookAdapter newestAdapter, featuredAdapter, bestSellingAdapter, mostLikedAdapter;
     private CategoryAdapter categoryAdapter;
+    private BannerAdapter bannerAdapter;
     
     private List<Book> newestBooks = new ArrayList<>();
     private List<Book> featuredBooks = new ArrayList<>();
     private List<Book> bestSellingBooks = new ArrayList<>();
     private List<Book> mostLikedBooks = new ArrayList<>();
     private List<Category> categoryList = new ArrayList<>();
+    private List<Banner> bannerList = new ArrayList<>();
+    
     private BookApiService apiService;
 
-    // Launcher for picking avatar from device
     private final ActivityResultLauncher<String> getAvatarLauncher = registerForActivityResult(
             new ActivityResultContracts.GetContent(),
-            uri -> {
-                if (uri != null) {
-                    uploadAvatar(uri);
-                }
-            }
+            uri -> { if (uri != null) uploadAvatar(uri); }
     );
 
     @Nullable
@@ -87,6 +86,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setupRecyclerViews();
+        setupBanners();
         setupListeners();
         loadUserAvatar();
         
@@ -94,6 +94,7 @@ public class HomeFragment extends Fragment {
             if (isAdded()) {
                 cleanAndFixCategories();
                 loadCategories();
+                loadBanners();
                 fetchBooksForHome();
             }
         }, 500);
@@ -107,12 +108,13 @@ public class HomeFragment extends Fragment {
         apiService = retrofit.create(BookApiService.class);
     }
 
+    private void setupBanners() {
+        bannerAdapter = new BannerAdapter(bannerList, banner -> {});
+        binding.viewPagerBanners.setAdapter(bannerAdapter);
+    }
+
     private void setupRecyclerViews() {
-        categoryAdapter = new CategoryAdapter(categoryList, category -> {
-            Bundle bundle = new Bundle();
-            bundle.putString("query", category.getName());
-            Navigation.findNavController(requireView()).navigate(R.id.action_homeFragment_to_searchFragment, bundle);
-        });
+        categoryAdapter = new CategoryAdapter(categoryList, category -> navigateToSearch(category.getName()));
         binding.rvCategories.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.rvCategories.setAdapter(categoryAdapter);
 
@@ -139,13 +141,31 @@ public class HomeFragment extends Fragment {
         binding.tvSeeAllBestSelling.setOnClickListener(v -> navigateToSearch("kinh tế"));
         binding.tvSeeAllMostLiked.setOnClickListener(v -> navigateToSearch("kỹ năng sống"));
         
-        // Long click to change avatar from laptop/device
         binding.ivUserAvatar.setOnLongClickListener(v -> {
             getAvatarLauncher.launch("image/*");
             return true;
         });
         
         binding.ivUserAvatar.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.profileFragment));
+    }
+
+    private void loadBanners() {
+        db.collection("banners").get().addOnSuccessListener(queryDocumentSnapshots -> {
+            if (isAdded()) {
+                bannerList.clear();
+                if (queryDocumentSnapshots != null && !queryDocumentSnapshots.isEmpty()) {
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        Banner banner = doc.toObject(Banner.class);
+                        bannerList.add(banner);
+                    }
+                } else {
+                    // Nếu DB chưa có banner, dùng banner mặc định tránh để trống (màu xám như hình)
+                    bannerList.add(new Banner("1", "https://img.freepik.com/free-vector/book-store-banner-template_23-2148685121.jpg"));
+                    bannerList.add(new Banner("2", "https://img.freepik.com/free-vector/hand-drawn-book-club-banner_23-2149721453.jpg"));
+                }
+                bannerAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     private void uploadAvatar(Uri uri) {
@@ -160,7 +180,7 @@ public class HomeFragment extends Fragment {
                         if (isAdded()) {
                             binding.progressBar.setVisibility(View.GONE);
                             Toast.makeText(getContext(), "Cập nhật ảnh đại diện thành công", Toast.LENGTH_SHORT).show();
-                            Glide.with(this).load(downloadUri).into(binding.ivUserAvatar);
+                            Glide.with(this).load(downloadUri).circleCrop().into(binding.ivUserAvatar);
                         }
                     });
         })).addOnFailureListener(e -> {
@@ -169,6 +189,23 @@ public class HomeFragment extends Fragment {
                 Toast.makeText(getContext(), "Lỗi tải ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void loadUserAvatar() {
+        String uid = mAuth.getUid();
+        if (uid != null) {
+            db.collection("users").document(uid).addSnapshotListener((doc, e) -> {
+                if (doc != null && doc.exists() && isAdded() && binding != null) {
+                    String url = doc.getString("avatarUrl");
+                    if (url != null && !url.isEmpty()) {
+                        Glide.with(this).load(url).circleCrop()
+                             .placeholder(R.drawable.ic_profile) // Hiện icon profile trong lúc load
+                             .error(R.drawable.ic_profile)       // Hiện icon profile nếu lỗi (Object not exist)
+                             .into(binding.ivUserAvatar);
+                    }
+                }
+            });
+        }
     }
 
     private void navigateToSearch(String query) {
@@ -180,11 +217,10 @@ public class HomeFragment extends Fragment {
     private void fetchBooksForHome() {
         if (binding == null) return;
         binding.progressBar.setVisibility(View.VISIBLE);
-
         fetchSection("văn học Việt Nam", featuredBooks, featuredAdapter, 0);
         fetchSection("kinh tế", bestSellingBooks, bestSellingAdapter, 1);
         fetchSection("kỹ năng sống", mostLikedBooks, mostLikedAdapter, 2);
-        fetchSection("sách mới xuất bản", newestBooks, newestAdapter, 3);
+        fetchSection("sách mới", newestBooks, newestAdapter, 3);
     }
 
     private void fetchSection(String query, List<Book> list, BookAdapter adapter, int sectionIndex) {
@@ -192,10 +228,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<GoogleBooksResponse> call, @NonNull Response<GoogleBooksResponse> response) {
                 if (!isAdded() || binding == null) return;
-                
-                if (sectionIndex == 3) {
-                    binding.progressBar.setVisibility(View.GONE);
-                }
+                if (sectionIndex == 3) binding.progressBar.setVisibility(View.GONE);
 
                 if (response.isSuccessful() && response.body() != null) {
                     List<GoogleBooksResponse.Item> items = response.body().getItems();
@@ -203,29 +236,21 @@ public class HomeFragment extends Fragment {
                         list.clear();
                         for (GoogleBooksResponse.Item item : items) {
                             Book book = convertToBook(item);
-                            // Only add books that have essential information to avoid "errors"
-                            if (isValidBook(book)) {
-                                list.add(book);
-                            }
+                            if (isValidBook(book)) list.add(book);
                         }
                         adapter.notifyDataSetChanged();
                     }
                 }
             }
 
-            @Override
-            public void onFailure(@NonNull Call<GoogleBooksResponse> call, @NonNull Throwable t) {
-                if (isAdded() && binding != null && sectionIndex == 3) {
-                    binding.progressBar.setVisibility(View.GONE);
-                }
+            @Override public void onFailure(@NonNull Call<GoogleBooksResponse> call, @NonNull Throwable t) {
+                if (isAdded() && binding != null && sectionIndex == 3) binding.progressBar.setVisibility(View.GONE);
             }
         });
     }
 
     private boolean isValidBook(Book book) {
-        return book.getTitle() != null && !book.getTitle().equals("N/A") 
-                && book.getImageUrl() != null && !book.getImageUrl().isEmpty()
-                && book.getPrice() > 0;
+        return book.getTitle() != null && book.getImageUrl() != null && book.getPrice() > 0;
     }
 
     private Book convertToBook(GoogleBooksResponse.Item item) {
@@ -235,7 +260,6 @@ public class HomeFragment extends Fragment {
         if (info != null) {
             book.setTitle(info.getTitle() != null ? info.getTitle() : "N/A");
             book.setAuthor(info.getAuthors() != null && !info.getAuthors().isEmpty() ? info.getAuthors().get(0) : "Unknown");
-            book.setDescription(info.getDescription());
             if (info.getImageLinks() != null) {
                 String url = info.getImageLinks().getThumbnail();
                 if (url != null) book.setImageUrl(url.replace("http://", "https://"));
@@ -246,64 +270,28 @@ public class HomeFragment extends Fragment {
         } else {
             book.setPrice(85000 + (long)(Math.random() * 150000));
         }
-        book.setStock(100);
         return book;
     }
 
     private void navigateToDetail(Book book) {
-        db.collection("books").document(book.getId()).set(book)
-                .addOnSuccessListener(aVoid -> {
-                    if (isAdded()) {
-                        Bundle bundle = new Bundle();
-                        bundle.putString("bookId", book.getId());
-                        Navigation.findNavController(requireView()).navigate(R.id.action_homeFragment_to_bookDetailFragment, bundle);
-                    }
-                });
-    }
-
-    private void loadUserAvatar() {
-        String uid = mAuth.getUid();
-        if (uid != null) {
-            db.collection("users").document(uid).addSnapshotListener((doc, e) -> {
-                if (doc != null && doc.exists() && isAdded() && binding != null) {
-                    String url = doc.getString("avatarUrl");
-                    if (url != null && !url.isEmpty()) {
-                        Glide.with(this).load(url).circleCrop().placeholder(R.drawable.ic_profile).into(binding.ivUserAvatar);
-                    }
-                }
-            });
-        }
-    }
-
-    private void cleanAndFixCategories() {
-        // Delete "hello" category and fix icons for others
-        db.collection("categories").get().addOnSuccessListener(queryDocumentSnapshots -> {
-            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                String name = doc.getString("name");
-                if (name != null) {
-                    if (name.equalsIgnoreCase("hello")) {
-                        db.collection("categories").document(doc.getId()).delete();
-                    } else {
-                        updateCategoryIcon(doc.getId(), name);
-                    }
-                }
+        db.collection("books").document(book.getId()).set(book).addOnSuccessListener(aVoid -> {
+            if (isAdded()) {
+                Bundle bundle = new Bundle();
+                bundle.putString("bookId", book.getId());
+                Navigation.findNavController(requireView()).navigate(R.id.action_homeFragment_to_bookDetailFragment, bundle);
             }
         });
     }
 
-    private void updateCategoryIcon(String id, String name) {
-        String iconUrl = "";
-        String n = name.toLowerCase();
-        if (n.contains("văn học") || n.contains("tiểu thuyết")) iconUrl = "https://cdn-icons-png.flaticon.com/512/3389/3389081.png";
-        else if (n.contains("kinh tế") || n.contains("tài chính")) iconUrl = "https://cdn-icons-png.flaticon.com/512/2761/2761118.png";
-        else if (n.contains("kỹ năng") || n.contains("self help")) iconUrl = "https://cdn-icons-png.flaticon.com/512/3079/3079204.png";
-        else if (n.contains("thiếu nhi") || n.contains("trẻ em")) iconUrl = "https://cdn-icons-png.flaticon.com/512/3082/3082060.png";
-        else if (n.contains("ngoại ngữ")) iconUrl = "https://cdn-icons-png.flaticon.com/512/3898/3898082.png";
-        else if (n.contains("khoa học")) iconUrl = "https://cdn-icons-png.flaticon.com/512/2103/2103633.png";
-        else if (n.contains("lịch sử")) iconUrl = "https://cdn-icons-png.flaticon.com/512/2234/2234668.png";
-        else iconUrl = "https://cdn-icons-png.flaticon.com/512/2436/2436636.png";
-
-        db.collection("categories").document(id).update("iconUrl", iconUrl);
+    private void cleanAndFixCategories() {
+        db.collection("categories").get().addOnSuccessListener(queryDocumentSnapshots -> {
+            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                String name = doc.getString("name");
+                if (name != null && name.equalsIgnoreCase("hello")) {
+                    db.collection("categories").document(doc.getId()).delete();
+                }
+            }
+        });
     }
 
     private void loadCategories() {
@@ -320,9 +308,5 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        binding = null;
-    }
+    @Override public void onDestroyView() { super.onDestroyView(); binding = null; }
 }

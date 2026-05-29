@@ -16,6 +16,7 @@ import com.example.appbansach.model.Voucher;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
 
@@ -46,7 +47,6 @@ public class CheckoutActivity extends AppCompatActivity {
 
         CartManager.getInstance(this).getCartItems().observe(this, items -> {
             if (items != null) {
-                // Chỉ lấy những mục đã được chọn để thanh toán
                 this.checkoutItems.clear();
                 for (CartItemEntity item : items) {
                     if (item.isSelected()) {
@@ -154,6 +154,10 @@ public class CheckoutActivity extends AppCompatActivity {
             itemMap.put("quantity", item.getQuantity());
             itemMap.put("imageUrl", item.getImageUrl());
             items.add(itemMap);
+            
+            // CẬP NHẬT: Trừ số lượng tồn kho của sách
+            DocumentReference bookRef = db.collection("books").document(item.getBookId());
+            batch.update(bookRef, "stock", FieldValue.increment(-item.getQuantity()));
         }
         order.setItems(items);
 
@@ -164,6 +168,9 @@ public class CheckoutActivity extends AppCompatActivity {
         order.setShippingAddress(addressMap);
 
         batch.set(orderRef, order);
+        
+        // Nếu có dùng voucher, có thể đánh dấu voucher đã sử dụng (tùy logic dự án)
+
         batch.commit().addOnSuccessListener(aVoid -> {
             CartManager.getInstance(this).deleteSelectedItems();
             

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">BookStore</string>
 
@@ -14,7 +15,7 @@
 
     <!-- Bottom Nav -->
     <string name="nav_home">Trang chủ</string>
-    <string name="nav_search">Tìm kiếm</string>
+    <string name="nav_search">Danh mục sách</string>
     <string name="nav_cart">Giỏ hàng</string>
     <string name="nav_profile">Cài đặt</string>
 

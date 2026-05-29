@@ -2,7 +2,7 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="160dp"
-    android:layout_height="wrap_content"
+    android:layout_height="350dp"
     android:layout_margin="8dp"
     app:cardBackgroundColor="@color/card_surface"
     app:cardCornerRadius="16dp"
@@ -11,33 +11,31 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <!-- fitCenter giữ nguyên tỷ lệ bìa sách, không bị vỡ/mờ -->
             <ImageView
                 android:id="@+id/ivBookCover"
                 android:layout_width="match_parent"
-                android:layout_height="220dp"
-                android:scaleType="fitCenter"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
                 android:background="#F5F5F5"
-                android:padding="8dp"
                 android:src="@android:drawable/ic_menu_gallery" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:padding="12dp">
 
                 <TextView
                     android:id="@+id/tvBookTitle"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:ellipsize="end"
                     android:maxLines="2"
                     android:textColor="@color/text_main"
@@ -54,13 +52,16 @@
                     android:ellipsize="end"
                     android:maxLines="1" />
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="6dp">
-
+                    android:gravity="bottom">
                     <TextView
                         android:id="@+id/tvPrice"
                         android:layout_width="wrap_content"
@@ -68,15 +69,13 @@
                         android:textColor="@color/sage_primary_dark"
                         android:textSize="15sp"
                         android:textStyle="bold" />
-
                     <TextView
                         android:id="@+id/tvOriginalPrice"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:textSize="11sp"
+                        android:layout_marginStart="8dp"
                         android:textColor="@color/text_secondary"
-                        android:alpha="0.7"
+                        android:textSize="12sp"
                         android:visibility="gone" />
                 </LinearLayout>
 

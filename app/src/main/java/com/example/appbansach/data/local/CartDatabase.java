@@ -9,7 +9,7 @@ import androidx.room.RoomDatabase;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {CartItemEntity.class}, version = 2, exportSchema = false)
+@Database(entities = {CartItemEntity.class}, version = 3, exportSchema = false)
 public abstract class CartDatabase extends RoomDatabase {
     public abstract CartDao cartDao();
 

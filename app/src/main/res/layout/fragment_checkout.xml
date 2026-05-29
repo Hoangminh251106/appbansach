@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/app_background"
     android:fillViewport="true">
 
     <LinearLayout
@@ -15,42 +16,64 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Thông tin giao hàng"
-            android:textSize="20sp"
+            android:textSize="22sp"
             android:textStyle="bold"
+            android:textColor="#000000"
             android:layout_marginBottom="16dp"/>
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="Họ và tên người nhận">
+            android:hint="Họ và tên người nhận"
+            android:textColorHint="#000000"
+            app:hintTextColor="#000000"
+            app:boxStrokeColor="#000000"
+            app:boxStrokeWidth="2dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etCheckoutName"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:textColor="#000000"
+                android:textStyle="bold" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
-            android:hint="Số điện thoại">
+            android:hint="Số điện thoại"
+            android:textColorHint="#000000"
+            app:hintTextColor="#000000"
+            app:boxStrokeColor="#000000"
+            app:boxStrokeWidth="2dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etCheckoutPhone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
+                android:textStyle="bold"
                 android:inputType="phone"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:hint="Địa chỉ giao hàng">
+            android:hint="Địa chỉ giao hàng"
+            android:textColorHint="#000000"
+            app:hintTextColor="#000000"
+            app:boxStrokeColor="#000000"
+            app:boxStrokeWidth="2dp">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etCheckoutAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#000000"
+                android:textStyle="bold"
                 android:inputType="textPostalAddress"/>
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -60,6 +83,7 @@
             android:text="Phương thức thanh toán"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:textColor="#000000"
             android:layout_marginBottom="8dp"/>
 
         <RadioGroup
@@ -72,18 +96,26 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Thanh toán khi nhận hàng (COD)"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:buttonTint="#000000"
                 android:checked="true"/>
             <RadioButton
                 android:id="@+id/rbMomo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Ví MoMo (Mô phỏng)"/>
+                android:text="Ví MoMo (Mô phỏng)"
+                android:buttonTint="#000000"
+                android:textStyle="bold"
+                android:textColor="#000000"/>
         </RadioGroup>
 
         <com.google.android.material.divider.MaterialDivider
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginBottom="16dp"
+            app:dividerColor="#000000"
+            app:dividerThickness="2dp"/>
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -92,29 +124,19 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tiền hàng:"/>
+                android:text="Tiền hàng:"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:textSize="16sp"/>
             <TextView
                 android:id="@+id/tvSubtotal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:textSize="16sp"
                 android:text="0đ"/>
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Phí vận chuyển:"/>
-            <TextView
-                android:id="@+id/tvShippingFee"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:text="30.000đ"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -125,33 +147,29 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Tổng thanh toán:"
-                android:textSize="18sp"
-                android:textStyle="bold"/>
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#000000"/>
             <TextView
                 android:id="@+id/tvTotalCheckout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:text="0đ"
-                android:textColor="?attr/colorPrimary"
-                android:textSize="18sp"
+                android:textColor="#1B4332"
+                android:textSize="22sp"
                 android:textStyle="bold"/>
         </RelativeLayout>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnPlaceOrder"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Đặt hàng"
-            android:padding="12dp"/>
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:visibility="gone"
-            android:layout_marginTop="16dp"/>
+            android:layout_height="60dp"
+            android:text="XÁC NHẬN ĐẶT HÀNG"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            app:backgroundTint="#1B4332"
+            app:cornerRadius="12dp"/>
 
     </LinearLayout>
 </ScrollView>

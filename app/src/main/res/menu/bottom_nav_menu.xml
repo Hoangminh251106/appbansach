@@ -7,7 +7,7 @@
     <item
         android:id="@+id/searchFragment"
         android:icon="@android:drawable/ic_menu_search"
-        android:title="Tìm kiếm" />
+        android:title="Danh mục sách" />
     <item
         android:id="@+id/cartFragment"
         android:icon="@android:drawable/ic_input_add"

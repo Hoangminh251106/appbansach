@@ -17,7 +17,6 @@ import androidx.navigation.Navigation;
 import com.bumptech.glide.Glide;
 import com.example.appbansach.R;
 import com.example.appbansach.databinding.FragmentEditProfileBinding;
-import com.example.appbansach.model.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -31,8 +30,6 @@ public class EditProfileFragment extends Fragment {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private FirebaseStorage storage;
-    private String userId;
-    private User currentUser;
     private Uri imageUri;
 
     private final ActivityResultLauncher<String> getContent = registerForActivityResult(
@@ -40,8 +37,7 @@ public class EditProfileFragment extends Fragment {
             uri -> {
                 if (uri != null) {
                     imageUri = uri;
-                    binding.ivEditAvatar.setImageURI(uri);
-                    binding.ivEditAvatar.setPadding(0, 0, 0, 0);
+                    binding.ivUserAvatar.setImageURI(uri);
                 }
             }
     );
@@ -54,96 +50,72 @@ public class EditProfileFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
 
-        if (mAuth.getCurrentUser() != null) {
-            userId = mAuth.getCurrentUser().getUid();
-            loadUserData();
-        }
+        loadUserData();
 
+        binding.ivUserAvatar.setOnClickListener(v -> getContent.launch("image/*"));
+        binding.btnSave.setOnClickListener(v -> updateProfile());
         binding.toolbar.setNavigationOnClickListener(v -> Navigation.findNavController(v).navigateUp());
-        binding.cardAvatar.setOnClickListener(v -> getContent.launch("image/*"));
-        binding.btnSave.setOnClickListener(v -> saveChanges());
 
         return binding.getRoot();
     }
 
     private void loadUserData() {
-        binding.progressBar.setVisibility(View.VISIBLE);
-        db.collection("users").document(userId).get().addOnSuccessListener(documentSnapshot -> {
-            if (isAdded()) {
-                binding.progressBar.setVisibility(View.GONE);
-                if (documentSnapshot.exists()) {
-                    currentUser = documentSnapshot.toObject(User.class);
-                    if (currentUser != null) {
-                        binding.etEmail.setText(currentUser.getEmail());
-                        binding.etFullName.setText(currentUser.getFullName());
-                        binding.etPhone.setText(currentUser.getPhone());
-                        binding.etAddress.setText(currentUser.getAddress());
+        String uid = mAuth.getUid();
+        if (uid == null) return;
 
-                        if (currentUser.getAvatarUrl() != null && !currentUser.getAvatarUrl().isEmpty()) {
-                            Glide.with(this).load(currentUser.getAvatarUrl()).into(binding.ivEditAvatar);
-                            binding.ivEditAvatar.setPadding(0, 0, 0, 0);
-                        }
-                    }
+        db.collection("users").document(uid).get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists() && isAdded()) {
+                binding.etFullName.setText(documentSnapshot.getString("fullName"));
+                binding.etPhone.setText(documentSnapshot.getString("phone"));
+                binding.etAddress.setText(documentSnapshot.getString("address"));
+                String avatarUrl = documentSnapshot.getString("avatarUrl");
+                if (avatarUrl != null && !avatarUrl.isEmpty()) {
+                    Glide.with(this).load(avatarUrl).circleCrop().placeholder(R.drawable.ic_profile).into(binding.ivUserAvatar);
                 }
             }
         });
     }
 
-    private void saveChanges() {
-        String fullName = binding.etFullName.getText().toString().trim();
-        String phone = binding.etPhone.getText().toString().trim();
-        String address = binding.etAddress.getText().toString().trim();
+    private void updateProfile() {
+        String uid = mAuth.getUid();
+        if (uid == null) return;
 
-        if (fullName.isEmpty()) {
-            binding.etFullName.setError("Vui lòng nhập họ tên");
-            return;
-        }
-
+        // Đã sửa: Sử dụng progressBar thay vì toolbar để tránh làm mất thanh tiêu đề khi đang lưu
         binding.progressBar.setVisibility(View.VISIBLE);
-        binding.btnSave.setEnabled(false);
-
         if (imageUri != null) {
-            uploadAvatarAndSave(fullName, phone, address);
+            StorageReference ref = storage.getReference().child("avatars/" + uid + ".jpg");
+            ref.putFile(imageUri).addOnSuccessListener(taskSnapshot -> ref.getDownloadUrl().addOnSuccessListener(uri -> {
+                saveToFirestore(uri.toString());
+            })).addOnFailureListener(e -> {
+                if (isAdded()) {
+                    binding.progressBar.setVisibility(View.GONE);
+                    if (e.getMessage() != null && !e.getMessage().contains("Object does not exist")) {
+                        Toast.makeText(getContext(), "Lỗi tải ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         } else {
-            updateFirestore(null, fullName, phone, address);
+            saveToFirestore(null);
         }
     }
 
-    private void uploadAvatarAndSave(String fullName, String phone, String address) {
-        String fileName = "avatars/" + userId + ".jpg";
-        StorageReference ref = storage.getReference().child(fileName);
-        ref.putFile(imageUri).addOnSuccessListener(taskSnapshot -> ref.getDownloadUrl().addOnSuccessListener(uri -> {
-            updateFirestore(uri.toString(), fullName, phone, address);
-        })).addOnFailureListener(e -> {
+    private void saveToFirestore(String avatarUrl) {
+        String uid = mAuth.getUid();
+        Map<String, Object> user = new HashMap<>();
+        user.put("fullName", binding.etFullName.getText().toString());
+        user.put("phone", binding.etPhone.getText().toString());
+        user.put("address", binding.etAddress.getText().toString());
+        if (avatarUrl != null) {
+            user.put("avatarUrl", avatarUrl);
+        }
+
+        db.collection("users").document(uid).update(user).addOnSuccessListener(aVoid -> {
             if (isAdded()) {
                 binding.progressBar.setVisibility(View.GONE);
-                binding.btnSave.setEnabled(true);
-                Toast.makeText(getContext(), "Lỗi tải ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
+                Navigation.findNavController(requireView()).navigateUp();
             }
         });
-    }
-
-    private void updateFirestore(String avatarUrl, String fullName, String phone, String address) {
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("fullName", fullName);
-        updates.put("phone", phone);
-        updates.put("address", address);
-        if (avatarUrl != null) updates.put("avatarUrl", avatarUrl);
-
-        db.collection("users").document(userId).update(updates)
-                .addOnSuccessListener(aVoid -> {
-                    if (isAdded()) {
-                        Toast.makeText(getContext(), "Cập nhật thành công", Toast.LENGTH_SHORT).show();
-                        Navigation.findNavController(requireView()).navigateUp();
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    if (isAdded()) {
-                        binding.progressBar.setVisibility(View.GONE);
-                        binding.btnSave.setEnabled(true);
-                        Toast.makeText(getContext(), "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
     }
 
     @Override

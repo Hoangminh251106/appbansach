@@ -57,6 +57,10 @@ dependencies {
     
     // Circle Image View
     implementation 'de.hdodenhof:circleimageview:3.1.0'
+    
+    // Google AI (Gemini)
+    implementation libs.generativeai
+    implementation libs.guava
 
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit

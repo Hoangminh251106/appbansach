@@ -80,19 +80,29 @@ public class BookDetailFragment extends Fragment {
 
         binding.btnAddToCart.setOnClickListener(v -> {
             if (book != null) {
-                CartManager.getInstance(requireContext()).addToCart(book);
-                Toast.makeText(getContext(), "Đã thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                if (book.getStock() > 0) {
+                    CartManager.getInstance(requireContext()).addToCart(book);
+                    Toast.makeText(getContext(), "Đã thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Sản phẩm đã hết hàng", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
         binding.btnBuyNow.setOnClickListener(v -> {
             if (book != null) {
-                CartManager.getInstance(requireContext()).addToCart(book);
-                Navigation.findNavController(v).navigate(R.id.cartFragment);
+                if (book.getStock() > 0) {
+                    CartManager.getInstance(requireContext()).addToCart(book);
+                    Navigation.findNavController(v).navigate(R.id.cartFragment);
+                } else {
+                    Toast.makeText(getContext(), "Sản phẩm đã hết hàng", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
-        binding.ivBack.setOnClickListener(v -> toggleWishlist());
+        binding.ivBack.setOnClickListener(v -> Navigation.findNavController(v).navigateUp());
+        
+        binding.btnAddToWishlist.setOnClickListener(v -> toggleWishlist());
 
         binding.tvWriteReview.setOnClickListener(v -> showWriteReviewDialog());
     }
@@ -148,7 +158,6 @@ public class BookDetailFragment extends Fragment {
     }
 
     private void updateBookOverallRating(float newRating) {
-        // Trong thực tế nên dùng Cloud Function hoặc Transaction để tính toán chính xác
         DocumentReference bookRef = db.collection("books").document(bookId);
         db.runTransaction(transaction -> {
             Book bookSnapshot = transaction.get(bookRef).toObject(Book.class);
@@ -223,7 +232,7 @@ public class BookDetailFragment extends Fragment {
     }
 
     private void updateWishlistFabIcon() {
-        binding.ivBack.setImageResource(isFavorite ? android.R.drawable.btn_star_big_on : android.R.drawable.btn_star_big_off);
+        binding.btnAddToWishlist.setImageResource(isFavorite ? android.R.drawable.btn_star_big_on : android.R.drawable.btn_star_big_off);
     }
 
     private void loadReviews() {
@@ -245,13 +254,13 @@ public class BookDetailFragment extends Fragment {
 
     private void displayBookDetails() {
         binding.collapsingToolbar.setTitle(book.getTitle());
-        binding.tvDetailReviewCount.setText(book.getTitle());
+        binding.tvBookTitle.setText(book.getTitle());
         binding.tvAuthor.setText("Tác giả: " + book.getAuthor());
 
         DecimalFormat formatter = new DecimalFormat("#,###");
-        binding.tvDetailOriginalPrice.setText(formatter.format(book.getPrice()) + "đ");
+        binding.tvPrice.setText(formatter.format(book.getPrice()) + "đ");
         
-        if (book.getOriginalPrice() > 0) {
+        if (book.getOriginalPrice() > 0 && book.getOriginalPrice() > book.getPrice()) {
             binding.tvDetailOriginalPrice.setText(formatter.format(book.getOriginalPrice()) + "đ");
             binding.tvDetailOriginalPrice.setPaintFlags(binding.tvDetailOriginalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
             binding.tvDetailOriginalPrice.setVisibility(View.VISIBLE);
@@ -266,9 +275,17 @@ public class BookDetailFragment extends Fragment {
         if (book.getStock() > 0) {
             binding.tvStockStatus.setText("Còn hàng (" + book.getStock() + ")");
             binding.tvStockStatus.setTextColor(getResources().getColor(android.R.color.holo_green_dark, null));
+            binding.btnAddToCart.setEnabled(true);
+            binding.btnBuyNow.setEnabled(true);
+            binding.btnAddToCart.setAlpha(1.0f);
+            binding.btnBuyNow.setAlpha(1.0f);
         } else {
             binding.tvStockStatus.setText("Hết hàng");
             binding.tvStockStatus.setTextColor(getResources().getColor(android.R.color.holo_red_dark, null));
+            binding.btnAddToCart.setEnabled(false);
+            binding.btnBuyNow.setEnabled(false);
+            binding.btnAddToCart.setAlpha(0.5f);
+            binding.btnBuyNow.setAlpha(0.5f);
         }
 
         Glide.with(this)

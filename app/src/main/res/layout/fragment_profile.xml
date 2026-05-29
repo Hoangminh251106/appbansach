@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/app_background"
     android:fillViewport="true">
 
     <LinearLayout
@@ -29,7 +29,7 @@
                 android:layout_marginBottom="16dp"
                 app:cardBackgroundColor="@color/white"
                 app:strokeWidth="2dp"
-                app:strokeColor="#9C27B0"
+                app:strokeColor="@color/sage_primary_dark"
                 app:cardElevation="0dp">
                 <ImageView
                     android:id="@+id/ivAvatar"
@@ -38,7 +38,7 @@
                     android:scaleType="centerCrop"
                     android:src="@android:drawable/ic_menu_myplaces"
                     android:padding="10dp"
-                    app:tint="#9C27B0"/>
+                    app:tint="@color/sage_primary_dark"/>
             </com.google.android.material.card.MaterialCardView>
 
             <TextView
@@ -48,7 +48,7 @@
                 android:text="Người dùng"
                 android:textSize="24sp"
                 android:textStyle="bold"
-                android:textColor="@color/black"/>
+                android:textColor="@color/text_main"/>
 
             <TextView
                 android:id="@+id/tvProfileEmail"
@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:text="user@gmail.com"
                 android:textSize="16sp"
-                android:textColor="#757575"
+                android:textColor="@color/text_secondary"
                 android:layout_marginBottom="32dp"/>
 
             <com.google.android.material.button.MaterialButton
@@ -69,9 +69,9 @@
                 android:gravity="start|center_vertical"
                 android:paddingStart="24dp"
                 android:textAllCaps="false"
-                app:backgroundTint="#F1E9F5"
-                android:textColor="#4A4A4A"
-                app:iconTint="#4A4A4A"
+                app:backgroundTint="@color/sage_accent"
+                android:textColor="@color/text_main"
+                app:iconTint="@color/text_main"
                 app:icon="@android:drawable/btn_star_big_on"
                 app:cornerRadius="30dp" />
 
@@ -85,9 +85,9 @@
                 android:gravity="start|center_vertical"
                 android:paddingStart="24dp"
                 android:textAllCaps="false"
-                app:backgroundTint="#F1E9F5"
-                android:textColor="#4A4A4A"
-                app:iconTint="#4A4A4A"
+                app:backgroundTint="@color/sage_accent"
+                android:textColor="@color/text_main"
+                app:iconTint="@color/text_main"
                 app:icon="@android:drawable/ic_menu_recent_history"
                 app:cornerRadius="30dp" />
 
@@ -101,9 +101,9 @@
                 android:gravity="start|center_vertical"
                 android:paddingStart="24dp"
                 android:textAllCaps="false"
-                app:backgroundTint="#F1E9F5"
-                android:textColor="#4A4A4A"
-                app:iconTint="#4A4A4A"
+                app:backgroundTint="@color/sage_accent"
+                android:textColor="@color/text_main"
+                app:iconTint="@color/text_main"
                 app:icon="@android:drawable/stat_notify_chat"
                 app:cornerRadius="30dp" />
 
@@ -117,9 +117,9 @@
                 android:gravity="start|center_vertical"
                 android:paddingStart="24dp"
                 android:textAllCaps="false"
-                app:backgroundTint="#F1E9F5"
-                android:textColor="#4A4A4A"
-                app:iconTint="#4A4A4A"
+                app:backgroundTint="@color/sage_accent"
+                android:textColor="@color/text_main"
+                app:iconTint="@color/text_main"
                 app:icon="@android:drawable/ic_menu_edit"
                 app:cornerRadius="30dp" />
 
@@ -133,9 +133,9 @@
                 android:gravity="start|center_vertical"
                 android:paddingStart="24dp"
                 android:textAllCaps="false"
-                app:backgroundTint="#F1E9F5"
-                android:textColor="#4A4A4A"
-                app:iconTint="#4A4A4A"
+                app:backgroundTint="@color/sage_accent"
+                android:textColor="@color/text_main"
+                app:iconTint="@color/text_main"
                 app:icon="@android:drawable/ic_lock_idle_lock"
                 app:cornerRadius="30dp"
                 android:visibility="gone"/>
@@ -176,14 +176,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Xin chào,"
-                        android:textColor="#757575"
+                        android:textColor="@color/text_secondary"
                         android:textSize="18sp" />
                     <TextView
                         android:id="@+id/tvAdminName"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Admin"
-                        android:textColor="#344E41"
+                        android:textColor="@color/text_main"
                         android:textSize="26sp"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -202,7 +202,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Chức năng quản lý"
-                android:textColor="#344E41"
+                android:textColor="@color/text_main"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:layout_marginBottom="20dp"/>
