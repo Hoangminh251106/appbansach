@@ -92,6 +92,22 @@
                 app:cornerRadius="30dp" />
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnNotifications"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="Thông báo"
+                android:layout_marginBottom="12dp"
+                android:gravity="start|center_vertical"
+                android:paddingStart="24dp"
+                android:textAllCaps="false"
+                app:backgroundTint="@color/sage_accent"
+                android:textColor="@color/text_main"
+                app:iconTint="@color/text_main"
+                app:icon="@android:drawable/ic_popup_reminder"
+                app:cornerRadius="30dp" />
+
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnChatSupport"
                 style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                 android:layout_width="match_parent"
@@ -139,20 +155,6 @@
                 app:icon="@android:drawable/ic_lock_idle_lock"
                 app:cornerRadius="30dp"
                 android:visibility="gone"/>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnLogout"
-                style="@style/Widget.MaterialComponents.Button"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:text="Đăng xuất"
-                android:textAllCaps="false"
-                app:backgroundTint="#D60000"
-                android:textColor="@color/white"
-                app:iconTint="@color/white"
-                app:icon="@android:drawable/ic_lock_power_off"
-                app:cornerRadius="30dp"
-                android:layout_marginTop="20dp"/>
         </LinearLayout>
 
         <!-- GIAO DIỆN QUẢN TRỊ (ADMIN DASHBOARD) -->
@@ -187,15 +189,6 @@
                         android:textSize="26sp"
                         android:textStyle="bold" />
                 </LinearLayout>
-                <ImageButton
-                    android:id="@+id/btnAdminLogout"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@android:drawable/ic_lock_power_off"
-                    app:tint="#D60000" />
             </RelativeLayout>
 
             <TextView
@@ -645,22 +638,24 @@
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
-
-            <!-- Nút đăng xuất cho Admin -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAdminLogoutLarge"
-                style="@style/Widget.MaterialComponents.Button"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:text="Đăng xuất"
-                android:textAllCaps="false"
-                app:backgroundTint="#D60000"
-                android:textColor="@color/white"
-                app:iconTint="@color/white"
-                app:icon="@android:drawable/ic_lock_power_off"
-                app:cornerRadius="30dp"
-                android:layout_marginTop="20dp"/>
         </LinearLayout>
+
+        <!-- Nút Đăng xuất CHUNG luôn hiển thị ở dưới cùng -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnLogout"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Đăng xuất"
+            android:textAllCaps="false"
+            app:backgroundTint="#D60000"
+            android:textColor="@color/white"
+            app:iconTint="@color/white"
+            app:icon="@android:drawable/ic_lock_power_off"
+            app:cornerRadius="30dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"
+            android:visibility="visible"/>
 
     </LinearLayout>
 </ScrollView>

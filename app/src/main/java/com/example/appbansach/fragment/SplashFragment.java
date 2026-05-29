@@ -14,6 +14,7 @@ import com.example.appbansach.R;
 import com.example.appbansach.databinding.FragmentSplashBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class SplashFragment extends Fragment {
     private FragmentSplashBinding binding;
@@ -39,10 +40,37 @@ public class SplashFragment extends Fragment {
     private void checkUserStatus() {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
-            // Nếu đã đăng nhập, vào thẳng màn hình Home
-            Navigation.findNavController(requireView()).navigate(R.id.action_splashFragment_to_homeFragment);
+            // Kiểm tra nhanh qua email
+            String email = currentUser.getEmail();
+            if (email != null && email.toLowerCase().contains("admin")) {
+                Navigation.findNavController(requireView()).navigate(R.id.action_splashFragment_to_profileFragment);
+                return;
+            }
+
+            // Kiểm tra role trong Firestore để chắc chắn
+            FirebaseFirestore.getInstance().collection("users").document(currentUser.getUid()).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (isAdded() && binding != null) {
+                        if (documentSnapshot.exists()) {
+                            String role = documentSnapshot.getString("role");
+                            if ("admin".equals(role)) {
+                                Navigation.findNavController(requireView()).navigate(R.id.action_splashFragment_to_profileFragment);
+                            } else {
+                                Navigation.findNavController(requireView()).navigate(R.id.action_splashFragment_to_homeFragment);
+                            }
+                        } else {
+                            // Nếu không có doc trong firestore, mặc định vào home hoặc yêu cầu login lại
+                            Navigation.findNavController(requireView()).navigate(R.id.action_splashFragment_to_homeFragment);
+                        }
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    if (isAdded()) {
+                        Navigation.findNavController(requireView()).navigate(R.id.action_splashFragment_to_homeFragment);
+                    }
+                });
         } else {
-            // Nếu chưa, yêu cầu đăng nhập
+            // Nếu chưa đăng nhập, yêu cầu đăng nhập
             Navigation.findNavController(requireView()).navigate(R.id.action_splashFragment_to_loginFragment);
         }
     }

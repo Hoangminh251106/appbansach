@@ -1,6 +1,5 @@
 package com.example.appbansach.adapter;
 
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
@@ -13,11 +12,15 @@ import java.util.Locale;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
     private List<NotificationModel> list;
-    private Context context;
+    private OnNotificationListener listener;
 
-    public NotificationAdapter(Context context, List<NotificationModel> list) {
-        this.context = context;
+    public interface OnNotificationListener {
+        void onNotificationClick(NotificationModel notification);
+    }
+
+    public NotificationAdapter(List<NotificationModel> list, OnNotificationListener listener) {
         this.list = list;
+        this.listener = listener;
     }
 
     @NonNull
@@ -36,16 +39,24 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
             holder.binding.tvNotiDate.setText(sdf.format(item.getSentAt().toDate()));
         }
+
+        // Thay đổi màu nền nếu chưa đọc
+        if (!item.isRead()) {
+            holder.itemView.setAlpha(1.0f);
+        } else {
+            holder.itemView.setAlpha(0.6f);
+        }
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onNotificationClick(item);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return list.size();
-    }
-
-    public void updateList(List<NotificationModel> newList) {
-        this.list = newList;
-        notifyDataSetChanged();
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {

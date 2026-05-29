@@ -35,7 +35,13 @@ public class AuthViewModel extends ViewModel {
         });
     }
 
+    // Thêm hàm để reset trạng thái login
+    public void resetLoginStatus() {
+        _loginStatus.setValue(null);
+    }
+
     public void logout() {
         userRepository.logout();
+        resetLoginStatus();
     }
 }

@@ -15,26 +15,29 @@
 
         <ImageView
             android:id="@+id/ivLogo"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_marginBottom="16dp"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginBottom="8dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_launcher_foreground" />
+            android:src="@drawable/app_logo" />
 
         <TextView
+            android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
             android:text="READ &amp; CHILL"
             android:textColor="@color/sage_primary_dark"
             android:textSize="36sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone" />
 
         <TextView
+            android:id="@+id/tvSubtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
-            android:text="Hiệu sách nhỏ của bạn"
+            android:layout_marginBottom="32dp"
+            android:text="Chào mừng bạn quay trở lại"
             android:textColor="@color/text_secondary"
             android:textSize="16sp" />
 

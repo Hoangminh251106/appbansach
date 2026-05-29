@@ -170,6 +170,10 @@ public class BookDetailFragment extends Fragment {
                 transaction.update(bookRef, "rating", newAverage);
             }
             return null;
+        }).addOnSuccessListener(aVoid -> {
+            if (isAdded()) {
+                loadBookDetails();
+            }
         });
     }
 

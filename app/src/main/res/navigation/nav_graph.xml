@@ -20,6 +20,11 @@
             app:destination="@id/homeFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_splashFragment_to_profileFragment"
+            app:destination="@id/profileFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
     </fragment>
 
     <fragment
@@ -33,6 +38,11 @@
         <action
             android:id="@+id/action_loginFragment_to_homeFragment"
             app:destination="@id/homeFragment"
+            app:popUpTo="@id/nav_graph"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_loginFragment_to_profileFragment"
+            app:destination="@id/profileFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
         <action
@@ -159,7 +169,16 @@
             app:destination="@id/loginFragment"
             app:popUpTo="@id/nav_graph"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_profileFragment_to_notificationsFragment"
+            app:destination="@id/notificationsFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/notificationsFragment"
+        android:name="com.example.appbansach.fragment.NotificationsFragment"
+        android:label="Thông báo"
+        tools:layout="@layout/fragment_notifications" />
 
     <fragment
         android:id="@+id/chatFragment"

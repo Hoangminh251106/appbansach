@@ -63,15 +63,20 @@ public class LoginFragment extends Fragment {
                     case SUCCESS:
                         binding.progressBar.setVisibility(View.GONE);
                         binding.btnLogin.setEnabled(true);
-                        Toast.makeText(getContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
                         
                         User user = resource.data;
-                        if (user != null && "admin".equals(user.getRole())) {
-                            // Nếu là admin, chuyển thẳng đến Profile (nơi chứa menu quản lý)
-                            Navigation.findNavController(requireView()).navigate(R.id.profileFragment);
-                        } else {
-                            // Nếu là khách hàng, chuyển đến Home
-                            Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_homeFragment);
+                        if (user != null) {
+                            String email = user.getEmail();
+                            // Kiểm tra nếu là Admin (qua email hoặc role)
+                            if ((email != null && email.toLowerCase().contains("admin")) || "admin".equals(user.getRole())) {
+                                Toast.makeText(getContext(), "Chào mừng Admin quay lại", Toast.LENGTH_SHORT).show();
+                                // Chuyển thẳng vào giao diện Admin (Profile)
+                                Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_profileFragment);
+                            } else {
+                                Toast.makeText(getContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+                                // Chuyển đến Trang chủ cho khách hàng
+                                Navigation.findNavController(requireView()).navigate(R.id.action_loginFragment_to_homeFragment);
+                            }
                         }
                         break;
                     case ERROR:

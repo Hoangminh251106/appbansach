@@ -19,6 +19,7 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
 
     public interface OnReviewListener {
         void onDelete(ReviewModel review);
+        void onReply(ReviewModel review);
     }
 
     public ReviewAdapter(List<ReviewModel> list, OnReviewListener listener) {
@@ -57,11 +58,25 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ViewHolder
             holder.binding.tvReviewDate.setText(sdf.format(item.getCreatedAt().toDate()));
         }
 
+        // Admin Reply UI
+        if (item.getAdminReply() != null && !item.getAdminReply().isEmpty()) {
+            holder.binding.layoutAdminReply.setVisibility(View.VISIBLE);
+            holder.binding.tvAdminReplyContent.setText(item.getAdminReply());
+            holder.binding.btnReplyReview.setText("Sửa phản hồi");
+        } else {
+            holder.binding.layoutAdminReply.setVisibility(View.GONE);
+            holder.binding.btnReplyReview.setText("Phản hồi");
+        }
+
         if (listener != null) {
             holder.binding.btnDeleteReview.setVisibility(View.VISIBLE);
+            holder.binding.btnReplyReview.setVisibility(View.VISIBLE);
+            
             holder.binding.btnDeleteReview.setOnClickListener(v -> listener.onDelete(item));
+            holder.binding.btnReplyReview.setOnClickListener(v -> listener.onReply(item));
         } else {
             holder.binding.btnDeleteReview.setVisibility(View.GONE);
+            holder.binding.btnReplyReview.setVisibility(View.GONE);
         }
     }
 

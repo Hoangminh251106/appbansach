@@ -4,9 +4,9 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.PropertyName;
 
 public class ReviewModel {
-    private String reviewId, userId, userName, bookId, bookTitle, content;
+    private String reviewId, userId, userName, bookId, bookTitle, content, adminReply;
     private float rating;
-    private Timestamp createdAt;
+    private Timestamp createdAt, repliedAt;
 
     public ReviewModel() {}
 
@@ -54,4 +54,10 @@ public class ReviewModel {
     public Timestamp getTimestamp() { return createdAt; }
     @PropertyName("timestamp")
     public void setTimestamp(Timestamp timestamp) { this.createdAt = timestamp; }
+
+    public String getAdminReply() { return adminReply; }
+    public void setAdminReply(String adminReply) { this.adminReply = adminReply; }
+
+    public Timestamp getRepliedAt() { return repliedAt; }
+    public void setRepliedAt(Timestamp repliedAt) { this.repliedAt = repliedAt; }
 }

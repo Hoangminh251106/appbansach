@@ -50,6 +50,11 @@
     <string name="cancel_order_confirm">Bạn có chắc chắn muốn hủy đơn hàng này không?</string>
     <string name="order_processing_note">Đơn hàng của bạn đang được Shop tiếp nhận và dự kiến xử lý trong vòng 24 giờ tới.</string>
     <string name="cancel_note_hint">* Bạn chỉ có thể hủy đơn hàng khi trạng thái là Chờ duyệt</string>
+    <string name="notifications_label">Thông báo</string>
+    <string name="notifications_with_count">Thông báo (%1$d)</string>
+    <string name="logout_confirm_title">Đăng xuất</string>
+    <string name="logout_confirm_msg">Bạn có chắc chắn muốn đăng xuất không?</string>
+    <string name="logout_success">Đã đăng xuất thành công</string>
 
     <!-- Admin -->
     <string name="admin_dashboard">Bảng điều khiển Admin</string>

@@ -24,14 +24,13 @@
                 android:layout_height="match_parent"
                 android:paddingHorizontal="16dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                <ImageView
+                    android:layout_width="120dp"
+                    android:layout_height="40dp"
                     android:layout_centerVertical="true"
-                    android:text="READ &amp; CHILL"
-                    android:textColor="@color/text_main"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
+                    android:scaleType="fitStart"
+                    android:src="@drawable/app_logo"
+                    android:contentDescription="BookShop Logo" />
 
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/ivUserAvatar"

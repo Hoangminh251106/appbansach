@@ -41,7 +41,9 @@ public class ManageNotificationsActivity extends AppCompatActivity {
         binding.toolbar.setNavigationOnClickListener(v -> finish());
 
         binding.rvNotifications.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new NotificationAdapter(this, notificationList);
+        // Fixed: The constructor expects (List<NotificationModel>, OnNotificationListener)
+        // Original was: new NotificationAdapter(this, notificationList);
+        adapter = new NotificationAdapter(notificationList, null);
         binding.rvNotifications.setAdapter(adapter);
 
         binding.btnSend.setOnClickListener(v -> sendNotification());
@@ -57,7 +59,8 @@ public class ManageNotificationsActivity extends AppCompatActivity {
         }
 
         binding.progressBar.setVisibility(View.VISIBLE);
-        NotificationModel notification = new NotificationModel(title, content, Timestamp.now());
+        // Fixed: Added null for userId and Timestamp.now() for sentAt to match NotificationModel constructor
+        NotificationModel notification = new NotificationModel(title, content, null, Timestamp.now());
 
         db.collection("notifications").add(notification)
                 .addOnSuccessListener(documentReference -> {
@@ -74,7 +77,8 @@ public class ManageNotificationsActivity extends AppCompatActivity {
 
     private void loadNotifications() {
         db.collection("notifications")
-                .orderBy("timestamp", Query.Direction.DESCENDING)
+                // Fixed: Use "sentAt" to match the field name in NotificationModel
+                .orderBy("sentAt", Query.Direction.DESCENDING)
                 .addSnapshotListener((value, error) -> {
                     if (error != null) return;
                     if (value != null) {
