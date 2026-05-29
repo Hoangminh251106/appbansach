@@ -19,7 +19,6 @@ import com.example.appbansach.R;
 import com.example.appbansach.admin.ManageNotificationsActivity;
 import com.example.appbansach.admin.ManagePaymentsActivity;
 import com.example.appbansach.admin.ManageReviewsActivity;
-import com.example.appbansach.admin.ManageSettingsActivity;
 import com.example.appbansach.admin.ManageShippingActivity;
 import com.example.appbansach.admin.ManageUsersActivity;
 import com.example.appbansach.databinding.FragmentProfileBinding;
@@ -88,7 +87,6 @@ public class ProfileFragment extends Fragment {
         binding.cardReviews.setOnClickListener(v -> startActivity(new Intent(getActivity(), ManageReviewsActivity.class)));
         binding.cardNotifications.setOnClickListener(v -> startActivity(new Intent(getActivity(), ManageNotificationsActivity.class)));
         binding.cardPayments.setOnClickListener(v -> startActivity(new Intent(getActivity(), ManagePaymentsActivity.class)));
-        binding.cardSettings.setOnClickListener(v -> startActivity(new Intent(getActivity(), ManageSettingsActivity.class)));
 
         binding.btnLogout.setOnClickListener(this::showLogoutConfirmation);
     }
