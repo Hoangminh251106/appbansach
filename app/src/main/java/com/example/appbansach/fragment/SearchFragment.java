@@ -13,16 +13,15 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.example.appbansach.R;
 import com.example.appbansach.adapter.BookAdapter;
-import com.example.appbansach.data.model.GoogleBooksResponse;
-import com.example.appbansach.data.repository.BookApiService;
 import com.example.appbansach.databinding.FragmentSearchBinding;
 import com.example.appbansach.model.Book;
-import com.example.appbansach.model.Category;
+import com.example.appbansach.ui.viewmodel.BookViewModel;
 import com.google.android.material.chip.Chip;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -30,23 +29,14 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-import okhttp3.OkHttpClient;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
 public class SearchFragment extends Fragment {
-    private static final String API_KEY = "AIzaSyCFaQyaHAn-95mXvT_2tFNqC2ugEGhquv8";
-    private static final String BASE_URL = "https://www.googleapis.com/books/v1/";
-
     private FragmentSearchBinding binding;
     private BookAdapter adapter;
+    private BookViewModel viewModel;
+    private FirebaseFirestore db;
+    
     private final List<Book> fullList = new ArrayList<>();
     private final List<Book> displayList = new ArrayList<>();
-    private FirebaseFirestore db;
-    private BookApiService apiService;
     
     private float minPrice = 0;
     private float maxPrice = 1000000;
@@ -59,6 +49,7 @@ public class SearchFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentSearchBinding.inflate(inflater, container, false);
         db = FirebaseFirestore.getInstance();
+        viewModel = new ViewModelProvider(this).get(BookViewModel.class);
         return binding.getRoot();
     }
 
@@ -66,69 +57,43 @@ public class SearchFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setupUI();
-        initRetrofit();
         loadCategories();
+        observeViewModel();
 
-        // Xử lý tham số truyền từ Trang chủ
         if (getArguments() != null) {
             if (getArguments().containsKey("category_name")) {
                 String category = getArguments().getString("category_name");
-                loadBooksByCategory(category);
+                binding.etSearch.setText(category);
+                viewModel.searchByCategory(category); // Sử dụng hàm tìm kiếm theo category chính xác hơn
             } else if (getArguments().containsKey("query")) {
                 String query = getArguments().getString("query");
                 binding.etSearch.setText(query);
-                executeApiCall(query);
-            } else {
-                loadBooksByCategory("Fiction");
+                viewModel.searchBooks(query);
             }
         } else {
-            loadBooksByCategory("Fiction");
+            viewModel.searchBooks("Sách");
         }
     }
 
-    private void initRetrofit() {
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        apiService = retrofit.create(BookApiService.class);
-    }
-
-    private void loadBooksByCategory(String categoryName) {
-        if (binding != null) {
-            binding.etSearch.setText(categoryName);
-            // Sửa lỗi: Không dùng "subject:" để tìm kiếm rộng hơn theo ý người dùng
-            executeApiCall(categoryName);
-        }
-    }
-
-    private void executeApiCall(String query) {
-        if (binding == null || apiService == null) return;
-        binding.progressBar.setVisibility(View.VISIBLE);
-        
-        apiService.searchBooks(query, API_KEY).enqueue(new Callback<GoogleBooksResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<GoogleBooksResponse> call, @NonNull Response<GoogleBooksResponse> response) {
-                if (!isAdded() || binding == null) return;
-                binding.progressBar.setVisibility(View.GONE);
-                
-                if (response.isSuccessful() && response.body() != null) {
-                    List<GoogleBooksResponse.Item> items = response.body().getItems();
-                    fullList.clear();
-                    if (items != null) {
-                        for (GoogleBooksResponse.Item item : items) {
-                            fullList.add(convertToBook(item));
-                        }
+    private void observeViewModel() {
+        viewModel.getSearchResults().observe(getViewLifecycleOwner(), resource -> {
+            if (resource == null) return;
+            switch (resource.status) {
+                case LOADING:
+                    binding.progressBar.setVisibility(View.VISIBLE);
+                    break;
+                case SUCCESS:
+                    binding.progressBar.setVisibility(View.GONE);
+                    if (resource.data != null) {
+                        fullList.clear();
+                        fullList.addAll(resource.data);
+                        updateUiList();
                     }
-                    updateUiList();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<GoogleBooksResponse> call, @NonNull Throwable t) {
-                if (!isAdded() || binding == null) return;
-                binding.progressBar.setVisibility(View.GONE);
-                Toast.makeText(getContext(), "Không thể kết nối máy chủ", Toast.LENGTH_SHORT).show();
+                    break;
+                case ERROR:
+                    binding.progressBar.setVisibility(View.GONE);
+                    Toast.makeText(getContext(), resource.message, Toast.LENGTH_SHORT).show();
+                    break;
             }
         });
     }
@@ -154,10 +119,10 @@ public class SearchFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String query = s.toString().trim();
-                if (query.length() >= 2) {
+                if (query.length() >= 3) {
                     searchHandler.removeCallbacks(searchRunnable);
-                    searchRunnable = () -> executeApiCall(query);
-                    searchHandler.postDelayed(searchRunnable, 1000);
+                    searchRunnable = () -> viewModel.searchBooks(query);
+                    searchHandler.postDelayed(searchRunnable, 800);
                 }
             }
             @Override
@@ -170,28 +135,6 @@ public class SearchFragment extends Fragment {
             maxPrice = values.get(1);
             updateUiList();
         });
-    }
-
-    private Book convertToBook(GoogleBooksResponse.Item item) {
-        Book book = new Book();
-        book.setId(item.getId());
-        GoogleBooksResponse.VolumeInfo info = item.getVolumeInfo();
-        if (info != null) {
-            book.setTitle(info.getTitle() != null ? info.getTitle() : "N/A");
-            book.setAuthor(info.getAuthors() != null && !info.getAuthors().isEmpty() ? info.getAuthors().get(0) : "Unknown");
-            book.setDescription(info.getDescription());
-            if (info.getImageLinks() != null) {
-                String url = info.getImageLinks().getThumbnail();
-                if (url != null) book.setImageUrl(url.replace("http://", "https://"));
-            }
-        }
-        if (item.getSaleInfo() != null && item.getSaleInfo().getListPrice() != null) {
-            book.setPrice((long) item.getSaleInfo().getListPrice().getAmount());
-        } else {
-            book.setPrice(75000 + (long)(Math.random() * 80000));
-        }
-        book.setStock(100);
-        return book;
     }
 
     private void updateUiList() {
@@ -215,7 +158,10 @@ public class SearchFragment extends Fragment {
                 if (name == null) continue;
                 Chip chip = (Chip) getLayoutInflater().inflate(R.layout.item_chip_category, binding.chipGroupCategories, false);
                 chip.setText(name);
-                chip.setOnClickListener(v -> loadBooksByCategory(name));
+                chip.setOnClickListener(v -> {
+                    binding.etSearch.setText(name);
+                    viewModel.searchByCategory(name);
+                });
                 binding.chipGroupCategories.addView(chip);
             }
         });

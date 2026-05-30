@@ -11,34 +11,52 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="12dp">
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical">
 
-        <TextView
-            android:id="@+id/tvNotiTitle"
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvNotiTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tiêu đề thông báo"
+                android:textColor="@color/text_main"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvNotiContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Nội dung chi tiết của thông báo..."
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tvNotiDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="12/03/2024 10:30"
+                android:textColor="@color/text_secondary"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnPush"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tiêu đề thông báo"
-            android:textColor="@color/text_main"
-            android:textStyle="bold" />
+            android:text="Đẩy tin"
+            android:textColor="#BC6C25"
+            app:icon="@android:drawable/ic_menu_send"
+            app:iconTint="#BC6C25" />
 
-        <TextView
-            android:id="@+id/tvNotiContent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="Nội dung chi tiết của thông báo đã gửi..."
-            android:textColor="@color/text_secondary"
-            android:textSize="13sp" />
-
-        <TextView
-            android:id="@+id/tvNotiDate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginTop="8dp"
-            android:text="12/03/2024 10:30"
-            android:textColor="@color/text_secondary"
-            android:textSize="11sp" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

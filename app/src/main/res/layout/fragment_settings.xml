@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/app_background"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/white"
+        app:navigationIcon="@drawable/ic_home"
+        app:title="Cài đặt ứng dụng"
+        app:titleTextColor="@color/text_main" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tài khoản &amp; Bảo mật"
+                android:textColor="#1B4332"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#F0F0F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnChangePassword"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:gravity="start|center_vertical"
+                        android:text="Đổi mật khẩu"
+                        android:textAllCaps="false"
+                        android:textColor="@color/text_main"
+                        app:icon="@drawable/ic_settings"
+                        app:iconTint="#1B4332" />
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0" android:layout_marginHorizontal="16dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnTwoFactor"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:gravity="start|center_vertical"
+                        android:text="Xác thực 2 lớp"
+                        android:textAllCaps="false"
+                        android:textColor="@color/text_main"
+                        app:icon="@drawable/ic_profile"
+                        app:iconTint="#1B4332" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Tùy chọn hiển thị"
+                android:textColor="#1B4332"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#F0F0F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="8dp">
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchNotification"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Nhận thông báo từ hệ thống"
+                        android:checked="true"
+                        android:paddingHorizontal="8dp" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchDarkMode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Chế độ tối (Dark Mode)"
+                        android:paddingHorizontal="8dp" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switchMarquee"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Thông báo chạy ngang"
+                        android:paddingHorizontal="8dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Hỗ trợ &amp; Giới thiệu"
+                android:textColor="#1B4332"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#F0F0F0"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnClearCache"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:gravity="start|center_vertical"
+                        android:text="Xóa bộ nhớ đệm"
+                        android:textAllCaps="false"
+                        android:textColor="@color/text_main"
+                        app:icon="@android:drawable/ic_menu_delete"
+                        app:iconTint="#1B4332" />
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#F0F0F0" android:layout_marginHorizontal="16dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnAbout"
+                        style="@style/Widget.MaterialComponents.Button.TextButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:gravity="start|center_vertical"
+                        android:text="Về BookStore"
+                        android:textAllCaps="false"
+                        android:textColor="@color/text_main"
+                        app:icon="@android:drawable/ic_menu_info_details"
+                        app:iconTint="#1B4332" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:gravity="center"
+                android:text="BookStore v1.0.2\nChúc bạn đọc sách vui vẻ!"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

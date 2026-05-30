@@ -9,6 +9,7 @@ import com.example.appbansach.utils.Resource;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 
 public class UserRepository {
     private static final String TAG = "UserRepository";
@@ -18,8 +19,7 @@ public class UserRepository {
     public LiveData<Resource<Boolean>> register(String email, String password, String fullName) {
         MutableLiveData<Resource<Boolean>> result = new MutableLiveData<>();
         result.setValue(Resource.loading(null));
-        Log.d(TAG, "Bắt đầu đăng ký Firebase cho: " + email);
-
+        
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -27,9 +27,7 @@ public class UserRepository {
                         User user = new User(uid, fullName, email, "", "", "customer", Timestamp.now());
                         saveUserToFirestore(user, result);
                     } else {
-                        String error = task.getException() != null ? task.getException().getMessage() : "Lỗi Auth";
-                        Log.e(TAG, "Lỗi Firebase Auth: " + error);
-                        result.setValue(Resource.error(error, null));
+                        result.setValue(Resource.error(task.getException().getMessage(), null));
                     }
                 });
         return result;
@@ -39,12 +37,9 @@ public class UserRepository {
         db.collection("users").document(user.getUid()).set(user)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Log.d(TAG, "Lưu Firestore thành công");
                         result.setValue(Resource.success(true));
                     } else {
-                        String error = task.getException() != null ? task.getException().getMessage() : "Lỗi Firestore";
-                        Log.e(TAG, "Lỗi Firestore: " + error);
-                        result.setValue(Resource.error(error, null));
+                        result.setValue(Resource.error(task.getException().getMessage(), null));
                     }
                 });
     }
@@ -74,6 +69,27 @@ public class UserRepository {
                     }
                 })
                 .addOnFailureListener(e -> result.setValue(Resource.error(e.getMessage(), null)));
+    }
+
+    // Tối ưu: Lắng nghe thay đổi User real-time
+    public LiveData<Resource<User>> observeCurrentUser() {
+        MutableLiveData<Resource<User>> result = new MutableLiveData<>();
+        String uid = getCurrentUid();
+        if (uid == null) {
+            result.setValue(Resource.error("Chưa đăng nhập", null));
+            return result;
+        }
+
+        db.collection("users").document(uid).addSnapshotListener((value, error) -> {
+            if (error != null) {
+                result.setValue(Resource.error(error.getMessage(), null));
+                return;
+            }
+            if (value != null && value.exists()) {
+                result.setValue(Resource.success(value.toObject(User.class)));
+            }
+        });
+        return result;
     }
 
     public void logout() { mAuth.signOut(); }

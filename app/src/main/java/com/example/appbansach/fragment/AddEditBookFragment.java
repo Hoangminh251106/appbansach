@@ -18,10 +18,13 @@ import com.bumptech.glide.Glide;
 import com.example.appbansach.R;
 import com.example.appbansach.databinding.FragmentAddEditBookBinding;
 import com.example.appbansach.model.Book;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class AddEditBookFragment extends Fragment {
@@ -91,10 +94,7 @@ public class AddEditBookFragment extends Fragment {
             })).addOnFailureListener(e -> {
                 if (isAdded()) {
                     binding.progressBar.setVisibility(View.GONE);
-                    // Sửa lỗi triệt để: Không hiện Toast nếu là lỗi file không tồn tại (Object not found)
-                    if (e.getMessage() != null && !e.getMessage().contains("Object does not exist")) {
-                        Toast.makeText(getContext(), "Lỗi tải ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
+                    Toast.makeText(getContext(), "Lỗi tải ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
@@ -103,24 +103,37 @@ public class AddEditBookFragment extends Fragment {
     }
 
     private void saveBook(String imageUrl) {
-        Book book = new Book();
-        book.setTitle(binding.etTitle.getText().toString());
-        book.setAuthor(binding.etAuthor.getText().toString());
-        book.setPrice(Long.parseLong(binding.etPrice.getText().toString()));
-        book.setStock(Integer.parseInt(binding.etStock.getText().toString()));
-        book.setDescription(binding.etDescription.getText().toString());
-        if (imageUrl != null) book.setImageUrl(imageUrl);
-        
-        String id = (bookId != null) ? bookId : UUID.randomUUID().toString();
-        book.setId(id);
+        // LIÊN KẾT: Sử dụng Map để update, tránh xóa mất soldCount và rating hiện tại
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("title", binding.etTitle.getText().toString());
+        updates.put("author", binding.etAuthor.getText().toString());
+        updates.put("price", Long.parseLong(binding.etPrice.getText().toString()));
+        updates.put("stock", Integer.parseInt(binding.etStock.getText().toString()));
+        updates.put("description", binding.etDescription.getText().toString());
+        if (imageUrl != null) updates.put("imageUrl", imageUrl);
 
-        db.collection("books").document(id).set(book).addOnSuccessListener(aVoid -> {
-            if (isAdded()) {
-                binding.progressBar.setVisibility(View.GONE);
-                Toast.makeText(getContext(), "Lưu thành công!", Toast.LENGTH_SHORT).show();
-                Navigation.findNavController(requireView()).navigateUp();
-            }
-        });
+        if (bookId == null) {
+            // Sách mới: Khởi tạo giá trị mặc định
+            bookId = UUID.randomUUID().toString();
+            updates.put("id", bookId);
+            updates.put("soldCount", 0);
+            updates.put("rating", 0.0);
+            updates.put("reviewCount", 0);
+            updates.put("createdAt", Timestamp.now());
+            
+            db.collection("books").document(bookId).set(updates).addOnSuccessListener(aVoid -> onSuccess());
+        } else {
+            // Sửa sách: Chỉ cập nhật các trường thay đổi, giữ nguyên rating/soldCount
+            db.collection("books").document(bookId).update(updates).addOnSuccessListener(aVoid -> onSuccess());
+        }
+    }
+
+    private void onSuccess() {
+        if (isAdded()) {
+            binding.progressBar.setVisibility(View.GONE);
+            Toast.makeText(getContext(), "Đã lưu thành công!", Toast.LENGTH_SHORT).show();
+            Navigation.findNavController(requireView()).navigateUp();
+        }
     }
 
     @Override

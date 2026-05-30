@@ -1,24 +1,22 @@
 package com.example.appbansach.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.appbansach.R;
 import com.example.appbansach.data.local.CartItemEntity;
 import com.example.appbansach.databinding.ActivityCheckoutBinding;
 import com.example.appbansach.helper.CartManager;
+import com.example.appbansach.model.Book;
 import com.example.appbansach.model.Order;
 import com.example.appbansach.model.Voucher;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.WriteBatch;
+import com.google.firebase.firestore.Transaction;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -34,7 +32,7 @@ public class CheckoutActivity extends AppCompatActivity {
     private long subtotal = 0;
     private long shippingFee = 30000;
     private long discount = 0;
-    private String selectedVoucherCode = "";
+    private long shippingDiscount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,19 +51,14 @@ public class CheckoutActivity extends AppCompatActivity {
                         this.checkoutItems.add(item);
                     }
                 }
-                
-                if (checkoutItems.isEmpty()) {
-                    Toast.makeText(this, "Không có sản phẩm nào được chọn", Toast.LENGTH_SHORT).show();
-                    finish();
-                    return;
-                }
-                
+                if (checkoutItems.isEmpty()) { finish(); return; }
                 calculateTotal();
             }
         });
 
         binding.btnApplyVoucher.setOnClickListener(v -> applyVoucher());
-        binding.btnPlaceOrder.setOnClickListener(v -> placeOrder());
+        binding.btnApplyShippingCode.setOnClickListener(v -> applyShippingCode());
+        binding.btnPlaceOrder.setOnClickListener(v -> placeOrderWithTransaction());
         binding.ivBack.setOnClickListener(v -> finish());
     }
 
@@ -77,47 +70,61 @@ public class CheckoutActivity extends AppCompatActivity {
         updateUI();
     }
 
-    private void applyVoucher() {
-        String code = binding.etVoucherCode.getText().toString().trim();
-        if (code.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập mã giảm giá", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        binding.progressBar.setVisibility(View.VISIBLE);
-        db.collection("vouchers").document(code).get().addOnSuccessListener(documentSnapshot -> {
-            binding.progressBar.setVisibility(View.GONE);
-            if (documentSnapshot.exists()) {
-                Voucher voucher = documentSnapshot.toObject(Voucher.class);
-                if (voucher != null) {
-                    if (subtotal >= voucher.getMinOrderAmount()) {
-                        discount = voucher.getDiscountAmount();
-                        selectedVoucherCode = code;
-                        updateUI();
-                        Toast.makeText(this, "Đã áp dụng mã giảm giá!", Toast.LENGTH_SHORT).show();
-                    } else {
-                        DecimalFormat formatter = new DecimalFormat("#,###");
-                        Toast.makeText(this, "Đơn hàng tối thiểu " + formatter.format(voucher.getMinOrderAmount()) + "đ", Toast.LENGTH_LONG).show();
-                    }
-                }
-            } else {
-                Toast.makeText(this, "Mã không hợp lệ", Toast.LENGTH_SHORT).show();
-            }
-        }).addOnFailureListener(e -> {
-            binding.progressBar.setVisibility(View.GONE);
-            Toast.makeText(this, "Lỗi kiểm tra mã", Toast.LENGTH_SHORT).show();
-        });
-    }
-
     private void updateUI() {
         DecimalFormat formatter = new DecimalFormat("#,###");
         binding.tvSubtotal.setText(formatter.format(subtotal) + "đ");
         binding.tvDiscount.setText("-" + formatter.format(discount) + "đ");
-        long grandTotal = subtotal + shippingFee - discount;
-        binding.tvCheckoutTotal.setText(formatter.format(grandTotal) + "đ");
+        binding.tvShippingFee.setText(formatter.format(shippingFee) + "đ");
+        binding.tvShippingDiscount.setText("-" + formatter.format(shippingDiscount) + "đ");
+        long finalTotal = subtotal + Math.max(0, shippingFee - shippingDiscount) - discount;
+        binding.tvCheckoutTotal.setText(formatter.format(finalTotal) + "đ");
     }
 
-    private void placeOrder() {
+    private void applyVoucher() {
+        String code = binding.etVoucherCode.getText().toString().trim().toUpperCase();
+        if (code.isEmpty()) return;
+
+        db.collection("vouchers").document(code).get().addOnSuccessListener(doc -> {
+            if (doc.exists()) {
+                Voucher v = doc.toObject(Voucher.class);
+                if (v != null) {
+                    if (subtotal >= v.getMinOrderAmount()) {
+                        discount = v.getDiscountAmount();
+                        updateUI();
+                        Toast.makeText(this, "Đã áp dụng mã giảm giá!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "Đơn hàng chưa đủ tối thiểu " + v.getMinOrderAmount() + "đ", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            } else {
+                Toast.makeText(this, "Mã giảm giá không tồn tại", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void applyShippingCode() {
+        String code = binding.etShippingCode.getText().toString().trim().toUpperCase();
+        if (code.isEmpty()) return;
+
+        db.collection("shipping_codes").document(code).get().addOnSuccessListener(doc -> {
+            if (doc.exists()) {
+                Voucher v = doc.toObject(Voucher.class); // Dùng chung model Voucher vì cấu trúc giống nhau
+                if (v != null) {
+                    if (subtotal >= v.getMinOrderAmount()) {
+                        shippingDiscount = v.getDiscountAmount();
+                        updateUI();
+                        Toast.makeText(this, "Đã áp dụng mã vận chuyển!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "Đơn hàng chưa đủ tối thiểu " + v.getMinOrderAmount() + "đ", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            } else {
+                Toast.makeText(this, "Mã vận chuyển không hợp lệ", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void placeOrderWithTransaction() {
         String name = binding.etCheckoutName.getText().toString().trim();
         String phone = binding.etCheckoutPhone.getText().toString().trim();
         String address = binding.etCheckoutAddress.getText().toString().trim();
@@ -130,64 +137,71 @@ public class CheckoutActivity extends AppCompatActivity {
         binding.progressBar.setVisibility(View.VISIBLE);
         binding.btnPlaceOrder.setEnabled(false);
 
-        WriteBatch batch = db.batch();
-        DocumentReference orderRef = db.collection("orders").document();
-        String orderId = orderRef.getId();
-        long finalTotal = subtotal + shippingFee - discount;
-        boolean isTransfer = binding.rbTransfer.isChecked();
+        final long finalTotal = subtotal + Math.max(0, shippingFee - shippingDiscount) - discount;
 
-        Order order = new Order();
-        order.setOrderId(orderId);
-        order.setUserId(mAuth.getUid());
-        order.setStatus("pending");
-        order.setCreatedAt(Timestamp.now());
-        order.setShippingFee(shippingFee);
-        order.setTotalAmount(finalTotal);
-        order.setPaymentMethod(isTransfer ? "Transfer" : "COD");
-
-        List<Map<String, Object>> items = new ArrayList<>();
-        for (CartItemEntity item : checkoutItems) {
-            Map<String, Object> itemMap = new HashMap<>();
-            itemMap.put("bookId", item.getBookId());
-            itemMap.put("title", item.getTitle());
-            itemMap.put("price", item.getPrice());
-            itemMap.put("quantity", item.getQuantity());
-            itemMap.put("imageUrl", item.getImageUrl());
-            items.add(itemMap);
-            
-            // CẬP NHẬT: Trừ số lượng tồn kho của sách
-            DocumentReference bookRef = db.collection("books").document(item.getBookId());
-            batch.update(bookRef, "stock", FieldValue.increment(-item.getQuantity()));
-        }
-        order.setItems(items);
-
-        Map<String, String> addressMap = new HashMap<>();
-        addressMap.put("name", name);
-        addressMap.put("phone", phone);
-        addressMap.put("address", address);
-        order.setShippingAddress(addressMap);
-
-        batch.set(orderRef, order);
-        
-        // Nếu có dùng voucher, có thể đánh dấu voucher đã sử dụng (tùy logic dự án)
-
-        batch.commit().addOnSuccessListener(aVoid -> {
-            CartManager.getInstance(this).deleteSelectedItems();
-            
-            if (isTransfer) {
-                Intent intent = new Intent(this, PaymentQRActivity.class);
-                intent.putExtra("amount", finalTotal);
-                intent.putExtra("orderId", orderId);
-                startActivity(intent);
-                finish();
-            } else {
-                Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
-                finish();
+        db.runTransaction((Transaction.Function<Void>) transaction -> {
+            for (CartItemEntity item : checkoutItems) {
+                DocumentReference bookRef = db.collection("books").document(item.getBookId());
+                Book book = transaction.get(bookRef).toObject(Book.class);
+                if (book == null || book.getStock() < item.getQuantity()) {
+                    throw new RuntimeException("Sách '" + item.getTitle() + "' không đủ hàng!");
+                }
             }
+
+            for (CartItemEntity item : checkoutItems) {
+                DocumentReference bookRef = db.collection("books").document(item.getBookId());
+                transaction.update(bookRef, "stock", com.google.firebase.firestore.FieldValue.increment(-item.getQuantity()));
+                transaction.update(bookRef, "soldCount", com.google.firebase.firestore.FieldValue.increment(item.getQuantity()));
+            }
+
+            DocumentReference orderRef = db.collection("orders").document();
+            Order order = new Order();
+            order.setOrderId(orderRef.getId());
+            order.setUserId(mAuth.getUid());
+            order.setStatus("pending");
+            order.setCreatedAt(Timestamp.now());
+            order.setTotalAmount(finalTotal);
+            order.setPaymentMethod(binding.rbTransfer.isChecked() ? "Transfer" : "COD");
+
+            List<Map<String, Object>> itemsList = new ArrayList<>();
+            for (CartItemEntity item : checkoutItems) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("bookId", item.getBookId());
+                map.put("title", item.getTitle());
+                map.put("quantity", item.getQuantity());
+                map.put("price", item.getPrice());
+                map.put("imageUrl", item.getImageUrl());
+                itemsList.add(map);
+            }
+            order.setItems(itemsList);
+
+            Map<String, String> addr = new HashMap<>();
+            addr.put("name", name);
+            addr.put("phone", phone);
+            addr.put("address", address);
+            order.setShippingAddress(addr);
+
+            transaction.set(orderRef, order);
+            return null;
+        }).addOnSuccessListener(aVoid -> {
+            CartManager.getInstance(this).deleteSelectedItems();
+            sendNotification(finalTotal);
+            Toast.makeText(this, "Đặt hàng thành công!", Toast.LENGTH_LONG).show();
+            finish();
         }).addOnFailureListener(e -> {
             binding.progressBar.setVisibility(View.GONE);
             binding.btnPlaceOrder.setEnabled(true);
-            Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_LONG).show();
         });
+    }
+
+    private void sendNotification(long amount) {
+        Map<String, Object> noti = new HashMap<>();
+        noti.put("userId", mAuth.getUid());
+        noti.put("title", "Đặt hàng thành công");
+        noti.put("content", "Đơn hàng trị giá " + amount + "đ đã được ghi nhận và đang chờ xử lý.");
+        noti.put("sentAt", Timestamp.now());
+        noti.put("isRead", false);
+        db.collection("notifications").add(noti);
     }
 }

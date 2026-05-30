@@ -1,6 +1,9 @@
 package com.example.appbansach.model;
 
+import com.google.firebase.firestore.Exclude;
+
 public class ChatMessage {
+    private String messageId;
     private String senderId;
     private String message;
     private long timestamp;
@@ -12,6 +15,10 @@ public class ChatMessage {
         this.message = message;
         this.timestamp = timestamp;
     }
+
+    @Exclude
+    public String getMessageId() { return messageId; }
+    public void setMessageId(String messageId) { this.messageId = messageId; }
 
     public String getSenderId() { return senderId; }
     public void setSenderId(String senderId) { this.senderId = senderId; }

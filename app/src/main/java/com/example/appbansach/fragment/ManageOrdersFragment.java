@@ -14,7 +14,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.appbansach.adapter.AdminOrderAdapter;
 import com.example.appbansach.databinding.FragmentManageOrdersBinding;
+import com.example.appbansach.model.NotificationModel;
 import com.example.appbansach.model.Order;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -50,12 +52,12 @@ public class ManageOrdersFragment extends Fragment {
         binding.progressBar.setVisibility(View.VISIBLE);
         db.collection("orders")
                 .orderBy("createdAt", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (isAdded()) {
-                        binding.progressBar.setVisibility(View.GONE);
+                .addSnapshotListener((value, error) -> {
+                    if (binding == null) return;
+                    binding.progressBar.setVisibility(View.GONE);
+                    if (value != null) {
                         orderList.clear();
-                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        for (QueryDocumentSnapshot doc : value) {
                             Order order = doc.toObject(Order.class);
                             order.setOrderId(doc.getId());
                             orderList.add(order);
@@ -67,7 +69,7 @@ public class ManageOrdersFragment extends Fragment {
 
     private void showUpdateStatusDialog(Order order) {
         String[] statuses = {"pending", "shipping", "delivered", "cancelled"};
-        String[] statusLabels = {"Chờ duyệt", "Đang giao", "Đã giao", "Hủy đơn"};
+        String[] statusLabels = {"Chờ duyệt", "Đang giao hàng", "Đã giao hàng", "Hủy đơn hàng"};
         
         int currentSelection = 0;
         for (int i = 0; i < statuses.length; i++) {
@@ -78,20 +80,28 @@ public class ManageOrdersFragment extends Fragment {
         }
 
         new AlertDialog.Builder(requireContext())
-                .setTitle("Cập nhật trạng thái đơn hàng")
+                .setTitle("Cập nhật trạng thái")
                 .setSingleChoiceItems(statusLabels, currentSelection, (dialog, which) -> {
-                    updateStatus(order, statuses[which]);
+                    updateStatusAndNotify(order, statuses[which], statusLabels[which]);
                     dialog.dismiss();
                 })
                 .show();
     }
 
-    private void updateStatus(Order order, String newStatus) {
+    private void updateStatusAndNotify(Order order, String newStatus, String label) {
         db.collection("orders").document(order.getOrderId())
                 .update("status", newStatus)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), "Đã cập nhật trạng thái", Toast.LENGTH_SHORT).show();
-                    loadAllOrders();
+                    Toast.makeText(getContext(), "Đã cập nhật: " + label, Toast.LENGTH_SHORT).show();
+                    
+                    // LIÊN KẾT: Tự động gửi thông báo cho User khi trạng thái thay đổi
+                    NotificationModel noti = new NotificationModel(
+                            "Cập nhật đơn hàng",
+                            "Đơn hàng #" + order.getOrderId().substring(0, 8) + " đã chuyển sang trạng thái: " + label,
+                            order.getUserId(),
+                            Timestamp.now()
+                    );
+                    db.collection("notifications").add(noti);
                 });
     }
 

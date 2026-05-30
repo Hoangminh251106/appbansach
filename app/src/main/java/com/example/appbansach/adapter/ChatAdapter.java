@@ -13,19 +13,52 @@ import com.example.appbansach.model.ChatMessage;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<ChatMessage> chatList;
+    private List<ChatMessage> chatListFull; // Danh sách gốc để tìm kiếm
     private String currentUserId = FirebaseAuth.getInstance().getUid();
+    private OnMessageLongClickListener longClickListener;
 
     private static final int VIEW_TYPE_SENT = 1;
     private static final int VIEW_TYPE_RECEIVED = 2;
 
-    public ChatAdapter(List<ChatMessage> chatList) {
+    public interface OnMessageLongClickListener {
+        void onMessageLongClick(ChatMessage message);
+    }
+
+    public ChatAdapter(List<ChatMessage> chatList, OnMessageLongClickListener listener) {
         this.chatList = chatList;
+        this.chatListFull = new ArrayList<>(chatList);
+        this.longClickListener = listener;
+    }
+
+    // Cập nhật danh sách khi có tin nhắn mới từ Firebase
+    public void updateList(List<ChatMessage> newList) {
+        this.chatList = new ArrayList<>(newList);
+        this.chatListFull = new ArrayList<>(newList);
+        notifyDataSetChanged();
+    }
+
+    // Logic tìm kiếm tin nhắn
+    public void filter(String query) {
+        List<ChatMessage> filteredList = new ArrayList<>();
+        if (query == null || query.isEmpty()) {
+            filteredList.addAll(chatListFull);
+        } else {
+            String filterPattern = query.toLowerCase().trim();
+            for (ChatMessage item : chatListFull) {
+                if (item.getMessage().toLowerCase().contains(filterPattern)) {
+                    filteredList.add(item);
+                }
+            }
+        }
+        this.chatList = filteredList;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -53,16 +86,24 @@ public class ChatAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         ChatMessage message = chatList.get(position);
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
-        
-        // Fix: timestamp is a long, not an object. Compare with 0 and use new Date()
         String time = message.getTimestamp() != 0 ? sdf.format(new Date(message.getTimestamp())) : "";
 
         if (holder instanceof SentViewHolder) {
-            ((SentViewHolder) holder).binding.tvMessage.setText(message.getMessage());
-            ((SentViewHolder) holder).binding.tvTime.setText(time);
+            SentViewHolder sentHolder = (SentViewHolder) holder;
+            sentHolder.binding.tvMessage.setText(message.getMessage());
+            sentHolder.binding.tvTime.setText(time);
+            sentHolder.itemView.setOnLongClickListener(v -> {
+                if (longClickListener != null) longClickListener.onMessageLongClick(message);
+                return true;
+            });
         } else {
-            ((ReceivedViewHolder) holder).binding.tvMessage.setText(message.getMessage());
-            ((ReceivedViewHolder) holder).binding.tvTime.setText(time);
+            ReceivedViewHolder receivedHolder = (ReceivedViewHolder) holder;
+            receivedHolder.binding.tvMessage.setText(message.getMessage());
+            receivedHolder.binding.tvTime.setText(time);
+            receivedHolder.itemView.setOnLongClickListener(v -> {
+                if (longClickListener != null) longClickListener.onMessageLongClick(message);
+                return true;
+            });
         }
     }
 

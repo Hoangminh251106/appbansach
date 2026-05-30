@@ -59,9 +59,7 @@
                         android:textColorHint="#000000"
                         app:hintTextColor="#000000"
                         app:boxStrokeColor="#000000"
-                        app:boxStrokeWidth="2dp"
-                        app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+                        app:boxStrokeWidth="2dp">
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etCheckoutName"
                             android:layout_width="match_parent"
@@ -79,9 +77,7 @@
                         android:textColorHint="#000000"
                         app:hintTextColor="#000000"
                         app:boxStrokeColor="#000000"
-                        app:boxStrokeWidth="2dp"
-                        app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+                        app:boxStrokeWidth="2dp">
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etCheckoutPhone"
                             android:layout_width="match_parent"
@@ -99,9 +95,7 @@
                         android:textColorHint="#000000"
                         app:hintTextColor="#000000"
                         app:boxStrokeColor="#000000"
-                        app:boxStrokeWidth="2dp"
-                        app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
+                        app:boxStrokeWidth="2dp">
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/etCheckoutAddress"
                             android:layout_width="match_parent"
@@ -112,55 +106,73 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Mã giảm giá -->
+            <!-- Voucher Sách -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Mã giảm giá"
-                android:textSize="18sp"
+                android:text="Mã giảm giá sách"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="#000000"
-                android:layout_marginBottom="12dp"/>
+                android:layout_marginBottom="8dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+                <EditText
+                    android:id="@+id/etVoucherCode"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:hint="Nhập mã giảm giá"
+                    android:background="@drawable/bg_search"
+                    android:paddingHorizontal="12dp"
+                    android:textSize="14sp"/>
+                <Button
+                    android:id="@+id/btnApplyVoucher"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:text="Áp dụng"
+                    android:layout_marginStart="8dp"
+                    android:backgroundTint="#1B4332"/>
+            </LinearLayout>
+
+            <!-- Voucher Vận chuyển -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mã vận chuyển (Freeship)"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:layout_marginBottom="8dp"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:layout_marginBottom="24dp">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                <EditText
+                    android:id="@+id/etShippingCode"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="50dp"
                     android:layout_weight="1"
-                    android:hint="Nhập mã ưu đãi"
-                    android:layout_marginEnd="8dp"
-                    android:textColorHint="#000000"
-                    app:hintTextColor="#000000"
-                    app:boxStrokeColor="#000000"
-                    app:boxStrokeWidth="2dp"
-                    app:boxCornerRadiusTopStart="12dp" app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp" app:boxCornerRadiusBottomEnd="12dp">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etVoucherCode"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:textColor="#000000"
-                        android:textStyle="bold" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnApplyVoucher"
+                    android:hint="Nhập mã vận chuyển"
+                    android:background="@drawable/bg_search"
+                    android:paddingHorizontal="12dp"
+                    android:textSize="14sp"/>
+                <Button
+                    android:id="@+id/btnApplyShippingCode"
                     android:layout_width="wrap_content"
-                    android:layout_height="56dp"
+                    android:layout_height="50dp"
                     android:text="Áp dụng"
-                    android:textStyle="bold"
-                    android:textColor="#FFFFFF"
-                    app:cornerRadius="12dp"
-                    app:backgroundTint="#1B4332"/>
+                    android:layout_marginStart="8dp"
+                    android:backgroundTint="#009688"/>
             </LinearLayout>
 
-            <!-- Thanh toán -->
+            <!-- Phương thức thanh toán -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -182,7 +194,6 @@
                     android:text="Thanh toán khi nhận hàng (COD)"
                     android:textColor="#000000"
                     android:textStyle="bold"
-                    android:buttonTint="#000000"
                     android:checked="true" />
                 <RadioButton
                     android:id="@+id/rbTransfer"
@@ -190,11 +201,10 @@
                     android:layout_height="wrap_content"
                     android:text="Chuyển khoản ngân hàng"
                     android:textStyle="bold"
-                    android:buttonTint="#000000"
                     android:textColor="#000000" />
             </RadioGroup>
 
-            <!-- Tổng tiền -->
+            <!-- Tổng kết tiền -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -202,8 +212,8 @@
                 app:cardCornerRadius="16dp"
                 app:cardBackgroundColor="@color/card_surface"
                 app:cardElevation="2dp"
-                app:strokeWidth="2dp"
-                app:strokeColor="#000000">
+                app:strokeWidth="1dp"
+                app:strokeColor="#DDDDDD">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -211,69 +221,31 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Tạm tính"
-                            android:textColor="#000000"
-                            android:textStyle="bold"/>
-                        <TextView
-                            android:id="@+id/tvSubtotal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:text="0đ"
-                            android:textColor="#000000" />
+                    <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tạm tính" android:textColor="#000000"/>
+                        <TextView android:id="@+id/tvSubtotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="0đ" android:textColor="#000000" />
                     </RelativeLayout>
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Giảm giá"
-                            android:textColor="#000000"
-                            android:textStyle="bold"/>
-                        <TextView
-                            android:id="@+id/tvDiscount"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:text="0đ"
-                            android:textColor="#000000" />
+                    <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Phí vận chuyển" android:textColor="#000000"/>
+                        <TextView android:id="@+id/tvShippingFee" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="30,000đ" android:textColor="#000000" />
                     </RelativeLayout>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#DDDDDD"
-                        android:layout_marginBottom="12dp" />
+                    <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Giảm giá sách" android:textColor="#000000"/>
+                        <TextView android:id="@+id/tvDiscount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="0đ" android:textColor="#D60000" />
+                    </RelativeLayout>
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Tổng thanh toán"
-                            android:textStyle="bold"
-                            android:textSize="18sp"
-                            android:textColor="#000000" />
-                        <TextView
-                            android:id="@+id/tvCheckoutTotal"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:text="0đ"
-                            android:textColor="#1B4332"
-                            android:textStyle="bold"
-                            android:textSize="22sp" />
+                    <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="8dp">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Giảm giá vận chuyển" android:textColor="#000000"/>
+                        <TextView android:id="@+id/tvShippingDiscount" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="0đ" android:textColor="#009688" />
+                    </RelativeLayout>
+
+                    <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#DDDDDD" android:layout_marginBottom="12dp" />
+
+                    <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tổng thanh toán" android:textStyle="bold" android:textSize="18sp" android:textColor="#000000" />
+                        <TextView android:id="@+id/tvCheckoutTotal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_alignParentEnd="true" android:text="0đ" android:textColor="#1B4332" android:textStyle="bold" android:textSize="22sp" />
                     </RelativeLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -285,7 +257,6 @@
                 android:text="Xác nhận đặt hàng"
                 android:textSize="18sp"
                 android:textStyle="bold"
-                android:textColor="@color/white"
                 app:backgroundTint="#1B4332"
                 app:cornerRadius="16dp" />
 

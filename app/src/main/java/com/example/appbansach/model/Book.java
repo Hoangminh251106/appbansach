@@ -13,6 +13,7 @@ public class Book implements Serializable {
     private String imageUrl;
     private String description;
     private int stock;
+    private int soldCount; // Thêm trường lượt bán
     private double rating;
     private int reviewCount;
     private boolean isFeatured;
@@ -40,6 +41,8 @@ public class Book implements Serializable {
     public void setDescription(String description) { this.description = description; }
     public int getStock() { return stock; }
     public void setStock(int stock) { this.stock = stock; }
+    public int getSoldCount() { return soldCount; }
+    public void setSoldCount(int soldCount) { this.soldCount = soldCount; }
     public double getRating() { return rating; }
     public void setRating(double rating) { this.rating = rating; }
     public int getReviewCount() { return reviewCount; }

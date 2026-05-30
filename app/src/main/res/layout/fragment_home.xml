@@ -31,19 +31,90 @@
                     android:src="@drawable/app_logo"
                     android:contentDescription="BookShop Logo" />
 
-                <com.google.android.material.imageview.ShapeableImageView
-                    android:id="@+id/ivUserAvatar"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/ic_profile"
-                    app:shapeAppearanceOverlay="@style/CircleImage"
-                    app:strokeColor="#1B4332"
-                    app:strokeWidth="2dp" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <RelativeLayout
+                        android:id="@+id/layoutNotification"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:padding="4dp">
+
+                        <ImageView
+                            android:id="@+id/ivNotification"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:src="@android:drawable/ic_popup_reminder"
+                            app:tint="#1B4332" />
+
+                        <TextView
+                            android:id="@+id/tvNotificationBadge"
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:layout_alignTop="@id/ivNotification"
+                            android:layout_alignEnd="@id/ivNotification"
+                            android:layout_marginTop="-4dp"
+                            android:layout_marginEnd="-4dp"
+                            android:background="@drawable/bg_circle_red"
+                            android:gravity="center"
+                            android:text="0"
+                            android:textColor="@color/white"
+                            android:textSize="9sp"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+                    </RelativeLayout>
+
+                    <com.google.android.material.imageview.ShapeableImageView
+                        android:id="@+id/ivUserAvatar"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_profile"
+                        app:shapeAppearanceOverlay="@style/CircleImage"
+                        app:strokeColor="#1B4332"
+                        app:strokeWidth="2dp" />
+                </LinearLayout>
             </RelativeLayout>
         </androidx.appcompat.widget.Toolbar>
+
+        <!-- Marquee Notification -->
+        <LinearLayout
+            android:id="@+id/layoutMarquee"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:background="#FFFCF2"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="12dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@android:drawable/stat_sys_warning"
+                app:tint="#BC6C25" />
+
+            <TextView
+                android:id="@+id/tvMarquee"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:ellipsize="marquee"
+                android:fadingEdge="horizontal"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:scrollHorizontally="true"
+                android:singleLine="true"
+                android:text="Chào mừng bạn đến với BookStore! Chúc bạn tìm được cuốn sách ưng ý."
+                android:textColor="#BC6C25"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.core.widget.NestedScrollView
@@ -60,7 +131,7 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="160dp"
+                android:layout_height="250dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="12dp"
                 app:cardBackgroundColor="@color/card_surface"
@@ -89,7 +160,7 @@
                 android:layout_marginTop="12dp"
                 android:paddingHorizontal="12dp" />
 
-            <!-- Các phần sách nổi bật giữ nguyên -->
+            <!-- Section: Sách nổi bật -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -113,12 +184,17 @@
                     android:textColor="#1B4332"
                     android:textStyle="bold" />
             </LinearLayout>
+
+            <include android:id="@+id/shimmerFeatured" layout="@layout/shimmer_home_section" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"/>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvFeaturedBooks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                android:visibility="gone" />
 
+            <!-- Section: Sách bán chạy -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -142,12 +218,17 @@
                     android:textColor="#1B4332"
                     android:textStyle="bold" />
             </LinearLayout>
+
+            <include android:id="@+id/shimmerBestSelling" layout="@layout/shimmer_home_section" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"/>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvBestSellingBooks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                android:visibility="gone" />
 
+            <!-- Section: Sách được yêu thích -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -159,7 +240,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Sách yêu thích"
+                    android:text="Sách được yêu thích"
                     android:textColor="@color/text_main"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -171,12 +252,14 @@
                     android:textColor="#1B4332"
                     android:textStyle="bold" />
             </LinearLayout>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvMostLikedBooks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp" />
 
+            <!-- Section: Sách mới nhất (Grid) -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -186,19 +269,44 @@
                 android:textColor="@color/text_main"
                 android:textSize="18sp"
                 android:textStyle="bold" />
+
+            <!-- Shimmer cho Grid mới nhất -->
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:id="@+id/shimmerNewest"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:shimmer_auto_start="true">
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:columnCount="2"
+                    android:padding="8dp">
+                    <include layout="@layout/shimmer_item_book" />
+                    <include layout="@layout/shimmer_item_book" />
+                    <include layout="@layout/shimmer_item_book" />
+                    <include layout="@layout/shimmer_item_book" />
+                </GridLayout>
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvNewestBooks"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp" />
+                android:layout_marginTop="8dp"
+                android:visibility="gone" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <ProgressBar
-        android:id="@+id/progressBar"
+    <!-- Chatbot Button -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabChat"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone" />
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:src="@drawable/ic_chatbot"
+        app:backgroundTint="#1B4332"
+        app:tint="@color/white" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

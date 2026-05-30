@@ -6,10 +6,8 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <queries>
-        <!-- Khai báo các gói cần tương tác -->
         <package android:name="com.google.android.gms" />
         <package android:name="com.android.vending" />
-        <!-- Khai báo intent chi tiết để vượt qua bộ lọc bảo mật trên một số dòng máy (Vivo, Oppo...) -->
         <intent>
             <action android:name="com.google.android.gms.common.service.START" />
         </intent>
@@ -48,15 +46,13 @@
         <activity android:name="com.example.appbansach.activity.CheckoutActivity" />
         <activity android:name="com.example.appbansach.activity.PaymentQRActivity" />
 
-        <!-- Admin Activities -->
+        <!-- Admin Activities - Đã dọn dẹp các mục dư thừa -->
         <activity android:name="com.example.appbansach.admin.ManageUsersActivity" />
         <activity android:name="com.example.appbansach.admin.UserDetailActivity" />
         <activity android:name="com.example.appbansach.admin.ManageShippingActivity" />
         <activity android:name="com.example.appbansach.admin.ShippingDetailActivity" />
         <activity android:name="com.example.appbansach.admin.ManageReviewsActivity" />
         <activity android:name="com.example.appbansach.admin.ManageNotificationsActivity" />
-        <activity android:name="com.example.appbansach.admin.ManagePaymentsActivity" />
-        <activity android:name="com.example.appbansach.admin.ManageSettingsActivity" />
 
     </application>
 

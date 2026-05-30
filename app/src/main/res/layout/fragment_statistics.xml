@@ -1,126 +1,206 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Thống kê doanh thu"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="24dp"/>
-
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="4dp"
-        app:contentPadding="16dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Tổng doanh thu"
-                android:textSize="16sp" />
-
-            <TextView
-                android:id="@+id/tvTotalRevenue"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="0đ"
-                android:textColor="?attr/colorPrimary"
-                android:textSize="28sp"
-                android:textStyle="bold"
-                android:layout_marginTop="8dp" />
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+    android:background="@color/app_background">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:baselineAligned="false">
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp">
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Thống kê doanh thu"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_main"
+                android:layout_centerVertical="true"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSelectDate"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:text="Chọn ngày"
+                app:icon="@android:drawable/ic_menu_today"
+                android:textColor="@color/sage_primary_dark" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tvSelectedDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ngày: Hôm nay"
+            android:textSize="16sp"
+            android:textColor="@color/text_secondary"
+            android:layout_marginBottom="16dp"/>
 
         <com.google.android.material.card.MaterialCardView
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            app:cardCornerRadius="12dp"
-            app:contentPadding="12dp">
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/white">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:gravity="center">
+                android:gravity="center"
+                android:padding="20dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Đơn hàng"
-                    android:textSize="14sp" />
+                    android:text="Tổng doanh thu"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_secondary"/>
 
                 <TextView
-                    android:id="@+id/tvTotalOrdersCount"
+                    android:id="@+id/tvTotalRevenue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textSize="20sp"
+                    android:text="0đ"
+                    android:textColor="#1B4332"
+                    android:textSize="32sp"
                     android:textStyle="bold"
-                    android:layout_marginTop="4dp" />
+                    android:layout_marginTop="8dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:baselineAligned="false"
+            android:layout_marginBottom="24dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Đơn hàng"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary"/>
+
+                    <TextView
+                        android:id="@+id/tvTotalOrdersCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/text_main"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="@color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sách đã bán"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary"/>
+
+                    <TextView
+                        android:id="@+id/tvTotalBooksSold"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/text_main"/>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Phân tích sản phẩm bán chạy"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"
+            android:textColor="@color/text_main"/>
 
         <com.google.android.material.card.MaterialCardView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            app:cardCornerRadius="12dp"
-            app:contentPadding="12dp">
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp"
+            android:layout_marginBottom="24dp">
 
-            <LinearLayout
+            <com.github.mikephil.charting.charts.HorizontalBarChart
+                android:id="@+id/barChart"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Sách đã bán"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/tvTotalBooksSold"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="4dp" />
-            </LinearLayout>
+                android:layout_height="match_parent"
+                android:padding="12dp"/>
         </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chi tiết các đầu sách đã bán"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"
+            android:textColor="@color/text_main"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvSoldBooksDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:layout_marginBottom="32dp"/>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+
     </LinearLayout>
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="32dp"
-        android:visibility="gone" />
-
-</LinearLayout>
+</ScrollView>

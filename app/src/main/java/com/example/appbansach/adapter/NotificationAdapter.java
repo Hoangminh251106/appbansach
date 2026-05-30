@@ -1,6 +1,7 @@
 package com.example.appbansach.adapter;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,14 +14,22 @@ import java.util.Locale;
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
     private List<NotificationModel> list;
     private OnNotificationListener listener;
+    private boolean isAdmin;
 
     public interface OnNotificationListener {
         void onNotificationClick(NotificationModel notification);
+        void onPushClick(NotificationModel notification); // Thêm sự kiện đẩy tin
     }
 
-    public NotificationAdapter(List<NotificationModel> list, OnNotificationListener listener) {
+    public NotificationAdapter(List<NotificationModel> list, boolean isAdmin, OnNotificationListener listener) {
         this.list = list;
+        this.isAdmin = isAdmin;
         this.listener = listener;
+    }
+
+    public void setAdmin(boolean admin) {
+        isAdmin = admin;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -40,18 +49,23 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
             holder.binding.tvNotiDate.setText(sdf.format(item.getSentAt().toDate()));
         }
 
-        // Thay đổi màu nền nếu chưa đọc
-        if (!item.isRead()) {
-            holder.itemView.setAlpha(1.0f);
-        } else {
-            holder.itemView.setAlpha(0.6f);
-        }
+        // Chỉ hiển thị nút đẩy tin nếu là admin
+        holder.binding.btnPush.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
+
+        holder.binding.btnPush.setOnClickListener(v -> {
+            if (listener != null) listener.onPushClick(item);
+        });
 
         holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onNotificationClick(item);
-            }
+            if (listener != null) listener.onNotificationClick(item);
         });
+        
+        // Hiển thị trạng thái chưa đọc (tùy chọn: đổi màu nền hoặc thêm dot)
+        if (!item.isRead()) {
+            holder.binding.getRoot().setAlpha(1.0f);
+        } else {
+            holder.binding.getRoot().setAlpha(0.6f);
+        }
     }
 
     @Override

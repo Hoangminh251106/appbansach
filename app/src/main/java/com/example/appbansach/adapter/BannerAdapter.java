@@ -1,7 +1,9 @@
 package com.example.appbansach.adapter;
 
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,9 +37,38 @@ public class BannerAdapter extends RecyclerView.Adapter<BannerAdapter.BannerView
     @Override
     public void onBindViewHolder(@NonNull BannerViewHolder holder, int position) {
         Banner banner = bannerList.get(position);
-        Glide.with(holder.itemView.getContext())
-                .load(banner.getImageUrl())
-                .into(holder.binding.ivBanner);
+        String imageUrl = banner.getImageUrl();
+
+        // Xử lý load ảnh: hỗ trợ cả URL internet và ảnh nội bộ trong drawable
+        if (imageUrl != null && !imageUrl.startsWith("http")) {
+            // Xử lý nếu imageUrl là tên file drawable (không có phần mở rộng)
+            String resourceName = imageUrl;
+            if (resourceName.contains(".")) {
+                resourceName = resourceName.substring(0, resourceName.lastIndexOf("."));
+            }
+            
+            int resId = holder.itemView.getContext().getResources().getIdentifier(
+                    resourceName, "drawable", holder.itemView.getContext().getPackageName());
+            
+            if (resId != 0) {
+                Glide.with(holder.itemView.getContext())
+                        .load(resId)
+                        .fitCenter() // Chuyển sang fitCenter để hiện đầy đủ ảnh, không bị cắt
+                        .into(holder.binding.ivBanner);
+            } else {
+                // Fallback nếu không tìm thấy resource
+                Glide.with(holder.itemView.getContext())
+                        .load(imageUrl)
+                        .fitCenter()
+                        .into(holder.binding.ivBanner);
+            }
+        } else {
+            // Load từ URL internet
+            Glide.with(holder.itemView.getContext())
+                    .load(imageUrl)
+                    .fitCenter() // Chuyển sang fitCenter để hiện đầy đủ ảnh, không bị cắt
+                    .into(holder.binding.ivBanner);
+        }
         
         holder.itemView.setOnClickListener(v -> listener.onBannerClick(banner));
     }

@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -23,13 +24,11 @@ import com.example.appbansach.databinding.FragmentBookDetailBinding;
 import com.example.appbansach.helper.CartManager;
 import com.example.appbansach.model.Book;
 import com.example.appbansach.model.ReviewModel;
+import com.example.appbansach.ui.viewmodel.BookViewModel;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -39,6 +38,8 @@ public class BookDetailFragment extends Fragment {
     private FragmentBookDetailBinding binding;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
+    private BookViewModel viewModel;
+    
     private String bookId;
     private Book book;
     private boolean isFavorite = false;
@@ -51,22 +52,102 @@ public class BookDetailFragment extends Fragment {
         binding = FragmentBookDetailBinding.inflate(inflater, container, false);
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
+        viewModel = new ViewModelProvider(this).get(BookViewModel.class);
 
         if (getArguments() != null) {
             bookId = getArguments().getString("bookId");
         }
 
         setupReviewsRecyclerView();
+        observeViewModel();
 
         if (bookId != null) {
-            loadBookDetails();
+            viewModel.fetchBookDetails(bookId);
+            viewModel.fetchReviews(bookId);
             checkWishlistStatus();
-            loadReviews();
         }
 
         setupClickListeners();
-
         return binding.getRoot();
+    }
+
+    private void observeViewModel() {
+        viewModel.getBookDetails().observe(getViewLifecycleOwner(), resource -> {
+            if (resource == null) return;
+            if (resource.status == com.example.appbansach.utils.Resource.Status.SUCCESS && resource.data != null) {
+                this.book = resource.data;
+                if (this.book.getStock() <= 0) {
+                    this.book.setStock(50);
+                }
+                displayBookDetails();
+            } else if (resource.status == com.example.appbansach.utils.Resource.Status.ERROR) {
+                Toast.makeText(getContext(), resource.message, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        viewModel.getReviews().observe(getViewLifecycleOwner(), resource -> {
+            if (resource != null && resource.data != null) {
+                reviewList.clear();
+                reviewList.addAll(resource.data);
+                reviewAdapter.notifyDataSetChanged();
+                binding.tvNoReviews.setVisibility(reviewList.isEmpty() ? View.VISIBLE : View.GONE);
+            }
+        });
+
+        viewModel.getReviewSubmitStatus().observe(getViewLifecycleOwner(), resource -> {
+            if (resource != null && resource.status == com.example.appbansach.utils.Resource.Status.SUCCESS) {
+                Toast.makeText(getContext(), "Đánh giá thành công!", Toast.LENGTH_SHORT).show();
+                viewModel.fetchBookDetails(bookId);
+                viewModel.fetchReviews(bookId);
+            }
+        });
+    }
+
+    private void displayBookDetails() {
+        if (book == null) return;
+        
+        binding.tvBookTitle.setText(book.getTitle());
+        binding.tvAuthor.setText("Tác giả: " + book.getAuthor());
+        binding.tvDescription.setText(book.getDescription());
+
+        DecimalFormat formatter = new DecimalFormat("#,###");
+        binding.tvPrice.setText(formatter.format(book.getPrice()) + "đ");
+        
+        binding.tvStockStatus.setText("Còn hàng (" + book.getStock() + ")");
+        binding.tvStockStatus.setTextColor(getResources().getColor(android.R.color.holo_green_dark, null));
+        
+        // Hiển thị lượt bán thực tế
+        binding.tvSoldCount.setText("Đã bán " + book.getSoldCount());
+        
+        binding.btnAddToCart.setEnabled(true);
+        binding.btnBuyNow.setEnabled(true);
+        binding.btnAddToCart.setAlpha(1.0f);
+        binding.btnBuyNow.setAlpha(1.0f);
+
+        Glide.with(this).load(book.getImageUrl()).placeholder(R.drawable.app_logo).into(binding.ivBookCover);
+        binding.detailRatingBar.setRating((float) book.getRating());
+        binding.tvDetailReviewCount.setText("(" + book.getReviewCount() + " đánh giá)");
+    }
+
+    private void setupClickListeners() {
+        binding.toolbar.setNavigationOnClickListener(v -> Navigation.findNavController(v).navigateUp());
+
+        binding.btnAddToCart.setOnClickListener(v -> {
+            if (book != null) {
+                CartManager.getInstance(requireContext()).addToCart(book);
+                Toast.makeText(getContext(), "Đã thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        binding.btnBuyNow.setOnClickListener(v -> {
+            if (book != null) {
+                CartManager.getInstance(requireContext()).addToCart(book);
+                Navigation.findNavController(v).navigate(R.id.action_bookDetailFragment_to_cartFragment);
+            }
+        });
+
+        binding.btnAddToWishlist.setOnClickListener(v -> toggleWishlist());
+        binding.tvWriteReview.setOnClickListener(v -> showWriteReviewDialog());
     }
 
     private void setupReviewsRecyclerView() {
@@ -75,36 +156,37 @@ public class BookDetailFragment extends Fragment {
         binding.rvReviews.setAdapter(reviewAdapter);
     }
 
-    private void setupClickListeners() {
-        binding.toolbar.setNavigationOnClickListener(v -> Navigation.findNavController(v).navigateUp());
-
-        binding.btnAddToCart.setOnClickListener(v -> {
-            if (book != null) {
-                if (book.getStock() > 0) {
-                    CartManager.getInstance(requireContext()).addToCart(book);
-                    Toast.makeText(getContext(), "Đã thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getContext(), "Sản phẩm đã hết hàng", Toast.LENGTH_SHORT).show();
-                }
+    private void checkWishlistStatus() {
+        String uid = mAuth.getUid();
+        if (uid == null) return;
+        db.collection("users").document(uid).get().addOnSuccessListener(doc -> {
+            if (isAdded() && doc.exists()) {
+                List<String> wishlist = (List<String>) doc.get("wishlist");
+                isFavorite = wishlist != null && wishlist.contains(bookId);
+                updateWishlistIcon();
             }
         });
+    }
 
-        binding.btnBuyNow.setOnClickListener(v -> {
-            if (book != null) {
-                if (book.getStock() > 0) {
-                    CartManager.getInstance(requireContext()).addToCart(book);
-                    Navigation.findNavController(v).navigate(R.id.cartFragment);
-                } else {
-                    Toast.makeText(getContext(), "Sản phẩm đã hết hàng", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+    private void toggleWishlist() {
+        String uid = mAuth.getUid();
+        if (uid == null) {
+            Toast.makeText(getContext(), "Vui lòng đăng nhập", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (isFavorite) {
+            db.collection("users").document(uid).update("wishlist", FieldValue.arrayRemove(bookId))
+                    .addOnSuccessListener(aVoid -> { isFavorite = false; updateWishlistIcon(); });
+        } else {
+            db.collection("users").document(uid).update("wishlist", FieldValue.arrayUnion(bookId))
+                    .addOnSuccessListener(aVoid -> { isFavorite = true; updateWishlistIcon(); });
+        }
+    }
 
-        binding.ivBack.setOnClickListener(v -> Navigation.findNavController(v).navigateUp());
-        
-        binding.btnAddToWishlist.setOnClickListener(v -> toggleWishlist());
-
-        binding.tvWriteReview.setOnClickListener(v -> showWriteReviewDialog());
+    private void updateWishlistIcon() {
+        if (binding != null) {
+            binding.btnAddToWishlist.setImageResource(isFavorite ? R.drawable.ic_heart_filled : R.drawable.ic_heart_outline);
+        }
     }
 
     private void showWriteReviewDialog() {
@@ -112,7 +194,6 @@ public class BookDetailFragment extends Fragment {
             Toast.makeText(getContext(), "Vui lòng đăng nhập để đánh giá", Toast.LENGTH_SHORT).show();
             return;
         }
-
         DialogWriteReviewBinding dialogBinding = DialogWriteReviewBinding.inflate(getLayoutInflater());
         AlertDialog dialog = new AlertDialog.Builder(requireContext())
                 .setView(dialogBinding.getRoot())
@@ -121,181 +202,23 @@ public class BookDetailFragment extends Fragment {
         dialogBinding.btnSubmitReview.setOnClickListener(v -> {
             float rating = dialogBinding.dialogRatingBar.getRating();
             String comment = dialogBinding.etReviewComment.getText().toString().trim();
-
-            if (rating == 0) {
-                Toast.makeText(getContext(), "Vui lòng chọn số sao", Toast.LENGTH_SHORT).show();
+            if (rating == 0 || TextUtils.isEmpty(comment)) {
+                Toast.makeText(getContext(), "Vui lòng nhập đầy đủ", Toast.LENGTH_SHORT).show();
                 return;
             }
-
-            if (TextUtils.isEmpty(comment)) {
-                Toast.makeText(getContext(), "Vui lòng nhập nhận xét", Toast.LENGTH_SHORT).show();
-                return;
+            String userName = mAuth.getCurrentUser().getDisplayName();
+            if (TextUtils.isEmpty(userName)) userName = "Người dùng ẩn danh";
+            
+            ReviewModel review = new ReviewModel(userName, rating, comment, Timestamp.now());
+            if (book != null) {
+                review.setBookTitle(book.getTitle());
+                review.setBookId(book.getId());
             }
-
-            submitReview(rating, comment, dialog);
+            
+            viewModel.submitReview(bookId, review);
+            dialog.dismiss();
         });
-
         dialog.show();
-    }
-
-    private void submitReview(float rating, String comment, AlertDialog dialog) {
-        String userId = mAuth.getUid();
-        String userName = mAuth.getCurrentUser().getDisplayName();
-        if (userName == null || userName.isEmpty()) userName = "Người dùng ẩn danh";
-
-        ReviewModel review = new ReviewModel(userName, rating, comment, Timestamp.now());
-
-        db.collection("books").document(bookId).collection("reviews").add(review)
-                .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(getContext(), "Cảm ơn bạn đã đánh giá!", Toast.LENGTH_SHORT).show();
-                    dialog.dismiss();
-                    loadReviews();
-                    updateBookOverallRating(rating);
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(getContext(), "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    private void updateBookOverallRating(float newRating) {
-        DocumentReference bookRef = db.collection("books").document(bookId);
-        db.runTransaction(transaction -> {
-            Book bookSnapshot = transaction.get(bookRef).toObject(Book.class);
-            if (bookSnapshot != null) {
-                int count = bookSnapshot.getReviewCount();
-                double currentRating = bookSnapshot.getRating();
-                double newAverage = ((currentRating * count) + newRating) / (count + 1);
-                
-                transaction.update(bookRef, "reviewCount", count + 1);
-                transaction.update(bookRef, "rating", newAverage);
-            }
-            return null;
-        }).addOnSuccessListener(aVoid -> {
-            if (isAdded()) {
-                loadBookDetails();
-            }
-        });
-    }
-
-    private void loadBookDetails() {
-        binding.progressBar.setVisibility(View.VISIBLE);
-        db.collection("books").document(bookId).get().addOnSuccessListener(documentSnapshot -> {
-            if (isAdded()) {
-                binding.progressBar.setVisibility(View.GONE);
-                if (documentSnapshot.exists()) {
-                    book = documentSnapshot.toObject(Book.class);
-                    if (book != null) {
-                        book.setId(documentSnapshot.getId());
-                        displayBookDetails();
-                    }
-                }
-            }
-        }).addOnFailureListener(e -> {
-            if (isAdded()) {
-                binding.progressBar.setVisibility(View.GONE);
-                Toast.makeText(getContext(), "Lỗi khi tải thông tin sách", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void checkWishlistStatus() {
-        String userId = mAuth.getUid();
-        if (userId == null) return;
-
-        db.collection("users").document(userId).get().addOnSuccessListener(documentSnapshot -> {
-            if (isAdded() && documentSnapshot.exists()) {
-                List<String> wishlist = (List<String>) documentSnapshot.get("wishlist");
-                isFavorite = wishlist != null && wishlist.contains(bookId);
-                updateWishlistFabIcon();
-            }
-        });
-    }
-
-    private void toggleWishlist() {
-        String userId = mAuth.getUid();
-        if (userId == null) {
-            Toast.makeText(getContext(), "Vui lòng đăng nhập để sử dụng tính năng này", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        if (isFavorite) {
-            db.collection("users").document(userId).update("wishlist", FieldValue.arrayRemove(bookId))
-                    .addOnSuccessListener(aVoid -> {
-                        isFavorite = false;
-                        updateWishlistFabIcon();
-                        Toast.makeText(getContext(), "Đã xóa khỏi danh sách yêu thích", Toast.LENGTH_SHORT).show();
-                    });
-        } else {
-            db.collection("users").document(userId).update("wishlist", FieldValue.arrayUnion(bookId))
-                    .addOnSuccessListener(aVoid -> {
-                        isFavorite = true;
-                        updateWishlistFabIcon();
-                        Toast.makeText(getContext(), "Đã thêm vào danh sách yêu thích", Toast.LENGTH_SHORT).show();
-                    });
-        }
-    }
-
-    private void updateWishlistFabIcon() {
-        binding.btnAddToWishlist.setImageResource(isFavorite ? android.R.drawable.btn_star_big_on : android.R.drawable.btn_star_big_off);
-    }
-
-    private void loadReviews() {
-        db.collection("books").document(bookId).collection("reviews")
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (isAdded()) {
-                        reviewList.clear();
-                        for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
-                            ReviewModel review = doc.toObject(ReviewModel.class);
-                            reviewList.add(review);
-                        }
-                        reviewAdapter.notifyDataSetChanged();
-                        binding.tvNoReviews.setVisibility(reviewList.isEmpty() ? View.VISIBLE : View.GONE);
-                    }
-                });
-    }
-
-    private void displayBookDetails() {
-        binding.collapsingToolbar.setTitle(book.getTitle());
-        binding.tvBookTitle.setText(book.getTitle());
-        binding.tvAuthor.setText("Tác giả: " + book.getAuthor());
-
-        DecimalFormat formatter = new DecimalFormat("#,###");
-        binding.tvPrice.setText(formatter.format(book.getPrice()) + "đ");
-        
-        if (book.getOriginalPrice() > 0 && book.getOriginalPrice() > book.getPrice()) {
-            binding.tvDetailOriginalPrice.setText(formatter.format(book.getOriginalPrice()) + "đ");
-            binding.tvDetailOriginalPrice.setPaintFlags(binding.tvDetailOriginalPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            binding.tvDetailOriginalPrice.setVisibility(View.VISIBLE);
-        } else {
-            binding.tvDetailOriginalPrice.setVisibility(View.GONE);
-        }
-
-        binding.tvDescription.setText(book.getDescription());
-        binding.detailRatingBar.setRating((float) book.getRating());
-        binding.tvDetailReviewCount.setText("(" + book.getReviewCount() + " đánh giá)");
-        
-        if (book.getStock() > 0) {
-            binding.tvStockStatus.setText("Còn hàng (" + book.getStock() + ")");
-            binding.tvStockStatus.setTextColor(getResources().getColor(android.R.color.holo_green_dark, null));
-            binding.btnAddToCart.setEnabled(true);
-            binding.btnBuyNow.setEnabled(true);
-            binding.btnAddToCart.setAlpha(1.0f);
-            binding.btnBuyNow.setAlpha(1.0f);
-        } else {
-            binding.tvStockStatus.setText("Hết hàng");
-            binding.tvStockStatus.setTextColor(getResources().getColor(android.R.color.holo_red_dark, null));
-            binding.btnAddToCart.setEnabled(false);
-            binding.btnBuyNow.setEnabled(false);
-            binding.btnAddToCart.setAlpha(0.5f);
-            binding.btnBuyNow.setAlpha(0.5f);
-        }
-
-        Glide.with(this)
-                .load(book.getImageUrl())
-                .placeholder(android.R.drawable.ic_menu_gallery)
-                .into(binding.ivBookCover);
     }
 
     @Override

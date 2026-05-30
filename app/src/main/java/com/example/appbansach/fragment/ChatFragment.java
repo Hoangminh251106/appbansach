@@ -2,185 +2,234 @@ package com.example.appbansach.fragment;
 
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.example.appbansach.adapter.ChatAdapter;
+import com.example.appbansach.adapter.ChatSessionAdapter;
 import com.example.appbansach.databinding.FragmentChatBinding;
 import com.example.appbansach.model.ChatMessage;
-import com.google.ai.client.generativeai.GenerativeModel;
-import com.google.ai.client.generativeai.java.GenerativeModelFutures;
-import com.google.ai.client.generativeai.type.Content;
-import com.google.ai.client.generativeai.type.GenerateContentResponse;
-import com.google.ai.client.generativeai.type.GenerationConfig;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
+import com.example.appbansach.model.ChatSession;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executor;
 
-public class ChatFragment extends Fragment {
+public class ChatFragment extends Fragment implements ChatSessionAdapter.OnSessionClickListener {
     private FragmentChatBinding binding;
-    private ChatAdapter adapter;
+    private ChatAdapter chatAdapter;
+    private ChatSessionAdapter sessionAdapter;
+    
     private final List<ChatMessage> chatList = new ArrayList<>();
-    private CollectionReference messageRef;
+    private final List<ChatSession> sessionList = new ArrayList<>();
+    
+    private FirebaseFirestore db;
+    private CollectionReference sessionsRef;
     private String currentUserId;
+    private String currentSessionId;
+    
     private ListenerRegistration messageListener;
-
-    private GenerativeModelFutures model;
-    // API Key của Google AI Studio
-    private static final String API_KEY = "AIzaSyCe0Ut1KaLwx65mtDBbWj4F-422uLHGIqY";
+    private ListenerRegistration sessionListener;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentChatBinding.inflate(inflater, container, false);
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db = FirebaseFirestore.getInstance();
         currentUserId = FirebaseAuth.getInstance().getUid();
 
-        initGemini();
-
         if (currentUserId != null) {
-            messageRef = db.collection("chats").document(currentUserId).collection("messages");
-            setupRecyclerView();
-            listenForMessages();
-            sendWelcomeMessageIfEmpty();
+            sessionsRef = db.collection("chats").document(currentUserId).collection("sessions");
+            setupChatRecycler();
+            setupHistoryRecycler();
+            setupDrawerAndSearch();
+            listenForSessions();
         }
 
         binding.btnSend.setOnClickListener(v -> sendMessage());
-        binding.toolbar.setNavigationOnClickListener(v -> Navigation.findNavController(v).navigateUp());
+        binding.toolbar.setNavigationOnClickListener(v -> binding.drawerLayout.openDrawer(GravityCompat.START));
+        binding.btnNewSession.setOnClickListener(v -> startNewChat());
 
         return binding.getRoot();
     }
 
-    private void initGemini() {
-        try {
-            GenerationConfig.Builder configBuilder = new GenerationConfig.Builder();
-            configBuilder.temperature = 0.7f;
-            GenerationConfig config = configBuilder.build();
-
-            // Đảm bảo tên model chính xác. Thử dùng "gemini-1.5-flash"
-            GenerativeModel gm = new GenerativeModel("gemini-1.5-flash", API_KEY, config);
-            model = GenerativeModelFutures.from(gm);
-        } catch (Exception e) {
-            Log.e("GeminiInitError", "Lỗi khởi tạo Gemini: " + e.getMessage());
-        }
-    }
-
-    private void setupRecyclerView() {
-        if (binding == null) return;
-        adapter = new ChatAdapter(chatList);
+    private void setupChatRecycler() {
+        chatAdapter = new ChatAdapter(chatList, this::showRecallDialog);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         layoutManager.setStackFromEnd(true);
         binding.rvChat.setLayoutManager(layoutManager);
-        binding.rvChat.setAdapter(adapter);
+        binding.rvChat.setAdapter(chatAdapter);
     }
 
-    private void listenForMessages() {
-        if (messageRef == null) return;
-        messageListener = messageRef.orderBy("timestamp", Query.Direction.ASCENDING)
-                .addSnapshotListener((value, error) -> {
-                    if (error != null) {
-                        Log.e("FirestoreError", "Lỗi: " + error.getMessage());
-                        return;
-                    }
-                    if (value == null) return;
-                    
-                    if (isAdded() && binding != null) {
-                        chatList.clear();
-                        for (DocumentSnapshot doc : value.getDocuments()) {
-                            ChatMessage msg = doc.toObject(ChatMessage.class);
-                            if (msg != null) chatList.add(msg);
-                        }
-                        if (adapter != null) {
-                            adapter.notifyDataSetChanged();
-                            if (!chatList.isEmpty()) {
-                                binding.rvChat.scrollToPosition(chatList.size() - 1);
-                            }
-                        }
-                    }
-                });
+    private void setupHistoryRecycler() {
+        sessionAdapter = new ChatSessionAdapter(sessionList, this);
+        binding.rvHistory.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.rvHistory.setAdapter(sessionAdapter);
     }
 
-    private void sendWelcomeMessageIfEmpty() {
-        if (messageRef == null) return;
-        messageRef.limit(1).get().addOnSuccessListener(queryDocumentSnapshots -> {
-            if (isAdded() && binding != null && queryDocumentSnapshots != null && queryDocumentSnapshots.isEmpty()) {
-                ChatMessage welcomeMsg = new ChatMessage("gemini", "Xin chào! Tôi là trợ lý ảo Gemini. Tôi có thể giúp gì cho bạn?", System.currentTimeMillis());
-                messageRef.add(welcomeMsg);
+    private void setupDrawerAndSearch() {
+        binding.searchHistory.setOnQueryTextListener(new androidx.appcompat.widget.SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                sessionAdapter.filter(query);
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                sessionAdapter.filter(newText);
+                return false;
             }
         });
     }
 
+    private void listenForSessions() {
+        sessionListener = sessionsRef.orderBy("lastTimestamp", Query.Direction.DESCENDING)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null || value == null || !isAdded()) return;
+                    sessionList.clear();
+                    for (DocumentSnapshot doc : value.getDocuments()) {
+                        ChatSession session = doc.toObject(ChatSession.class);
+                        if (session != null) {
+                            session.setId(doc.getId());
+                            sessionList.add(session);
+                        }
+                    }
+                    sessionAdapter.updateList(sessionList);
+                });
+    }
+
+    @Override
+    public void onSessionClick(ChatSession session) {
+        loadSession(session.getId(), session.getTitle());
+        binding.drawerLayout.closeDrawer(GravityCompat.START);
+    }
+
+    @Override
+    public void onSessionDelete(ChatSession session) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Xóa đoạn chat")
+                .setMessage("Bạn có chắc muốn xóa lịch sử đoạn chat này không?")
+                .setPositiveButton("Xóa", (dialog, which) -> {
+                    deleteSessionRecursive(session.getId());
+                })
+                .setNegativeButton("Hủy", null)
+                .show();
+    }
+
+    private void deleteSessionRecursive(String sessionId) {
+        sessionsRef.document(sessionId).collection("messages").get().addOnSuccessListener(querySnapshot -> {
+            WriteBatch batch = db.batch();
+            for (DocumentSnapshot doc : querySnapshot) batch.delete(doc.getReference());
+            batch.delete(sessionsRef.document(sessionId));
+            batch.commit().addOnSuccessListener(aVoid -> {
+                if (sessionId.equals(currentSessionId)) startNewChat();
+                Toast.makeText(getContext(), "Đã xóa đoạn chat", Toast.LENGTH_SHORT).show();
+            });
+        });
+    }
+
+    private void startNewChat() {
+        currentSessionId = null;
+        chatList.clear();
+        chatAdapter.updateList(chatList);
+        binding.toolbar.setTitle("Đoạn chat mới");
+        binding.drawerLayout.closeDrawer(GravityCompat.START);
+        sendWelcomeMessage();
+    }
+
+    private void sendWelcomeMessage() {
+        chatList.add(new ChatMessage("BookStore", "Xin chào! Tôi là trợ lý BookStore AI. Hôm nay tôi có thể giúp gì cho bạn?", System.currentTimeMillis()));
+        chatAdapter.updateList(chatList);
+    }
+
+    private void loadSession(String sessionId, String title) {
+        if (messageListener != null) messageListener.remove();
+        currentSessionId = sessionId;
+        binding.toolbar.setTitle(title);
+
+        messageListener = sessionsRef.document(sessionId).collection("messages")
+                .orderBy("timestamp", Query.Direction.ASCENDING)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null || value == null || !isAdded()) return;
+                    chatList.clear();
+                    for (DocumentSnapshot doc : value.getDocuments()) {
+                        ChatMessage msg = doc.toObject(ChatMessage.class);
+                        if (msg != null) {
+                            msg.setMessageId(doc.getId());
+                            chatList.add(msg);
+                        }
+                    }
+                    chatAdapter.updateList(chatList);
+                    binding.rvChat.scrollToPosition(chatList.size() - 1);
+                });
+    }
+
     private void sendMessage() {
-        if (binding == null) return;
         String msgText = binding.etMessage.getText().toString().trim();
         if (TextUtils.isEmpty(msgText)) return;
 
-        if (messageRef != null) {
-            ChatMessage userMsg = new ChatMessage(currentUserId, msgText, System.currentTimeMillis());
-            messageRef.add(userMsg);
-            binding.etMessage.setText("");
-            getGeminiResponse(msgText);
+        if (currentSessionId == null) {
+            // Tạo session mới khi gửi tin đầu tiên
+            DocumentReference newSession = sessionsRef.document();
+            currentSessionId = newSession.getId();
+            ChatSession session = new ChatSession(currentSessionId, msgText, System.currentTimeMillis());
+            newSession.set(session);
+            loadSession(currentSessionId, msgText);
         }
+
+        ChatMessage userMsg = new ChatMessage(currentUserId, msgText, System.currentTimeMillis());
+        sessionsRef.document(currentSessionId).collection("messages").add(userMsg);
+        sessionsRef.document(currentSessionId).update("lastTimestamp", System.currentTimeMillis());
+        
+        binding.etMessage.setText("");
+        getBotResponse(msgText);
     }
 
-    private void getGeminiResponse(String userMessage) {
-        if (model == null || getContext() == null) return;
+    private void getBotResponse(String userMessage) {
+        String response = "Tôi đã nhận được yêu cầu của bạn về: " + userMessage + ". Bạn cần tôi tư vấn sâu hơn về đầu sách nào không?";
+        
+        binding.getRoot().postDelayed(() -> {
+            if (currentSessionId != null && isAdded()) {
+                ChatMessage botMsg = new ChatMessage("BookStore", response, System.currentTimeMillis());
+                sessionsRef.document(currentSessionId).collection("messages").add(botMsg);
+            }
+        }, 1000);
+    }
 
-        Content content = new Content.Builder()
-                .addText(userMessage)
-                .build();
-
-        try {
-            ListenableFuture<GenerateContentResponse> response = model.generateContent(content);
-            Executor mainExecutor = ContextCompat.getMainExecutor(requireContext());
-            
-            Futures.addCallback(response, new FutureCallback<GenerateContentResponse>() {
-                @Override
-                public void onSuccess(GenerateContentResponse result) {
-                    if (isAdded() && binding != null && result != null) {
-                        String aiResponse = result.getText();
-                        if (aiResponse != null && messageRef != null) {
-                            ChatMessage aiMsg = new ChatMessage("gemini", aiResponse, System.currentTimeMillis());
-                            messageRef.add(aiMsg);
-                        }
+    private void showRecallDialog(ChatMessage message) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Thu hồi")
+                .setMessage("Bạn muốn thu hồi tin nhắn này?")
+                .setPositiveButton("Có", (dialog, which) -> {
+                    if (currentSessionId != null && message.getMessageId() != null) {
+                        sessionsRef.document(currentSessionId).collection("messages").document(message.getMessageId()).delete();
                     }
-                }
-
-                @Override
-                public void onFailure(@NonNull Throwable t) {
-                    Log.e("GeminiError", "Lỗi AI: " + t.getMessage());
-                }
-            }, mainExecutor);
-        } catch (Exception e) {
-            Log.e("GeminiError", "Lỗi: " + e.getMessage());
-        }
+                })
+                .setNegativeButton("Không", null)
+                .show();
     }
 
     @Override
     public void onDestroyView() {
+        if (messageListener != null) messageListener.remove();
+        if (sessionListener != null) sessionListener.remove();
         super.onDestroyView();
-        if (messageListener != null) {
-            messageListener.remove();
-        }
-        binding = null; // Chốt chặn quan trọng để tránh crash NullPointerException
+        binding = null;
     }
 }

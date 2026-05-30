@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel;
 import com.example.appbansach.data.repository.UserRepository;
 import com.example.appbansach.model.User;
 import com.example.appbansach.utils.Resource;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class AuthViewModel extends ViewModel {
     private final UserRepository userRepository;
@@ -35,7 +36,15 @@ public class AuthViewModel extends ViewModel {
         });
     }
 
-    // Thêm hàm để reset trạng thái login
+    // Tối ưu: Lấy thông tin người dùng hiện tại real-time cho Profile
+    public LiveData<Resource<User>> getCurrentUser() {
+        return userRepository.observeCurrentUser();
+    }
+
+    public String getCurrentUid() {
+        return FirebaseAuth.getInstance().getUid();
+    }
+
     public void resetLoginStatus() {
         _loginStatus.setValue(null);
     }

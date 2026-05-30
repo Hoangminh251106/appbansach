@@ -1,60 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/app_background">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <!-- Main Content -->
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@color/app_background"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@android:drawable/ic_menu_revert"
-        app:navigationIconTint="@color/text_main"
-        app:title="Hỗ trợ trực tuyến"
-        app:titleTextColor="@color/text_main" />
+        android:layout_height="match_parent">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvChat"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:padding="12dp"
-        app:layout_constraintBottom_toTopOf="@id/layoutInput"
-        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/app_background"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navigationIcon="@android:drawable/ic_menu_sort_by_size"
+            app:navigationIconTint="@color/text_main"
+            app:title="BookStore AI"
+            app:titleTextColor="@color/text_main" />
 
-    <LinearLayout
-        android:id="@+id/layoutInput"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/card_surface"
-        android:elevation="12dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="8dp"
-        app:layout_constraintBottom_toBottomOf="parent">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvChat"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:padding="12dp"
+            app:layout_constraintBottom_toTopOf="@id/layoutInput"
+            app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
-        <EditText
-            android:id="@+id/etMessage"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:id="@+id/layoutInput"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@android:color/transparent"
-            android:hint="Nhập tin nhắn..."
-            android:textColor="@color/text_main"
-            android:textColorHint="@color/text_secondary"
-            android:maxLines="4"
-            android:padding="12dp" />
+            android:background="@color/card_surface"
+            android:elevation="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-        <ImageButton
-            android:id="@+id/btnSend"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@android:drawable/ic_menu_send"
-            app:tint="@color/sage_primary" />
-    </LinearLayout>
+            <EditText
+                android:id="@+id/etMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:hint="Hỏi AI về sách..."
+                android:textColor="@color/text_main"
+                android:textColorHint="@color/text_secondary"
+                android:maxLines="4"
+                android:padding="12dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageButton
+                android:id="@+id/btnSend"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@android:drawable/ic_menu_send"
+                app:tint="@color/sage_primary" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Drawer (History) -->
+    <com.google.android.material.navigation.NavigationView
+        android:layout_width="280dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@color/app_background">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lịch sử trò chuyện"
+                android:textColor="@color/text_main"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.SearchView
+                android:id="@+id/searchHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_search_view"
+                app:iconifiedByDefault="false"
+                app:queryHint="Tìm phiên chat..." />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnNewSession"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text=" + Đoạn chat mới"
+                android:textAllCaps="false"
+                android:textColor="@color/sage_primary"
+                app:strokeColor="@color/sage_primary" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvHistory"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1" />
+        </LinearLayout>
+    </com.google.android.material.navigation.NavigationView>
+
+</androidx.drawerlayout.widget.DrawerLayout>

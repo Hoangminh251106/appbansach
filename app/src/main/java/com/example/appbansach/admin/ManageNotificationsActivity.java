@@ -17,9 +17,11 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class ManageNotificationsActivity extends AppCompatActivity {
+public class ManageNotificationsActivity extends AppCompatActivity implements NotificationAdapter.OnNotificationListener {
     private ActivityManageNotificationsBinding binding;
     private FirebaseFirestore db;
     private NotificationAdapter adapter;
@@ -41,9 +43,7 @@ public class ManageNotificationsActivity extends AppCompatActivity {
         binding.toolbar.setNavigationOnClickListener(v -> finish());
 
         binding.rvNotifications.setLayoutManager(new LinearLayoutManager(this));
-        // Fixed: The constructor expects (List<NotificationModel>, OnNotificationListener)
-        // Original was: new NotificationAdapter(this, notificationList);
-        adapter = new NotificationAdapter(notificationList, null);
+        adapter = new NotificationAdapter(notificationList, true, this);
         binding.rvNotifications.setAdapter(adapter);
 
         binding.btnSend.setOnClickListener(v -> sendNotification());
@@ -59,15 +59,14 @@ public class ManageNotificationsActivity extends AppCompatActivity {
         }
 
         binding.progressBar.setVisibility(View.VISIBLE);
-        // Fixed: Added null for userId and Timestamp.now() for sentAt to match NotificationModel constructor
-        NotificationModel notification = new NotificationModel(title, content, null, Timestamp.now());
+        NotificationModel notification = new NotificationModel(title, content, "all", Timestamp.now());
 
         db.collection("notifications").add(notification)
                 .addOnSuccessListener(documentReference -> {
                     binding.progressBar.setVisibility(View.GONE);
                     binding.etTitle.setText("");
                     binding.etContent.setText("");
-                    Toast.makeText(this, "Đã gửi thông báo thành công", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Đã lưu thông báo", Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
                     binding.progressBar.setVisibility(View.GONE);
@@ -77,7 +76,6 @@ public class ManageNotificationsActivity extends AppCompatActivity {
 
     private void loadNotifications() {
         db.collection("notifications")
-                // Fixed: Use "sentAt" to match the field name in NotificationModel
                 .orderBy("sentAt", Query.Direction.DESCENDING)
                 .addSnapshotListener((value, error) -> {
                     if (error != null) return;
@@ -85,10 +83,30 @@ public class ManageNotificationsActivity extends AppCompatActivity {
                         notificationList.clear();
                         for (QueryDocumentSnapshot doc : value) {
                             NotificationModel item = doc.toObject(NotificationModel.class);
+                            item.setId(doc.getId());
                             notificationList.add(item);
                         }
                         adapter.notifyDataSetChanged();
                     }
                 });
+    }
+
+    @Override
+    public void onNotificationClick(NotificationModel notification) {
+        // Có thể thêm chức năng xem chi tiết hoặc xóa
+    }
+
+    @Override
+    public void onPushClick(NotificationModel notification) {
+        // Chức năng đẩy tin: Cập nhật vào một document đặc biệt để User nhận Marquee
+        Map<String, Object> broadcast = new HashMap<>();
+        broadcast.put("title", notification.getTitle());
+        broadcast.put("content", notification.getContent());
+        broadcast.put("timestamp", Timestamp.now());
+        broadcast.put("active", true);
+
+        db.collection("system").document("broadcast").set(broadcast)
+                .addOnSuccessListener(aVoid -> Toast.makeText(this, "Đã đẩy tin nhắn chạy màn hình!", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 }
