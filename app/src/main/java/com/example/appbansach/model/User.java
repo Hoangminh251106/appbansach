@@ -13,8 +13,10 @@ public class User {
     private String avatarUrl;
     private String role; // "customer" or "admin"
     private String status; // "active" or "locked"
+    private boolean twoFactorEnabled;
+    private String securityPin; // Mã PIN 4 số cho 2FA
     private List<String> wishlist = new ArrayList<>();
-    private List<Object> currentCart = new ArrayList<>(); // Thêm trường này để khớp với dữ liệu Firestore
+    private List<Object> currentCart = new ArrayList<>();
     private Timestamp createdAt;
 
     public User() {}
@@ -27,6 +29,8 @@ public class User {
         this.address = address;
         this.role = role;
         this.status = "active";
+        this.twoFactorEnabled = false;
+        this.securityPin = "";
         this.createdAt = createdAt;
         this.wishlist = new ArrayList<>();
         this.currentCart = new ArrayList<>();
@@ -49,6 +53,10 @@ public class User {
     public void setRole(String role) { this.role = role; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+    public boolean isTwoFactorEnabled() { return twoFactorEnabled; }
+    public void setTwoFactorEnabled(boolean twoFactorEnabled) { this.twoFactorEnabled = twoFactorEnabled; }
+    public String getSecurityPin() { return securityPin; }
+    public void setSecurityPin(String securityPin) { this.securityPin = securityPin; }
     public List<String> getWishlist() { return wishlist; }
     public void setWishlist(List<String> wishlist) { this.wishlist = wishlist; }
     public List<Object> getCurrentCart() { return currentCart; }
